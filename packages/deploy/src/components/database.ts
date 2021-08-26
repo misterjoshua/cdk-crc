@@ -1,7 +1,9 @@
 import * as dynamodb from '@aws-cdk/aws-dynamodb';
 import * as cdk from '@aws-cdk/core';
 
+/** Create a database containing "hits" or anything else, really. */
 export class Database extends cdk.Construct {
+  /** The produced DynamoDB table */
   public readonly table: dynamodb.Table;
 
   constructor(scope: cdk.Construct, id: string) {

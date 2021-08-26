@@ -11,6 +11,9 @@ import {
   PIPELINE_REPO_BRANCH,
 } from './constants';
 
+/**
+ * Create a CDK Pipeline from github to production.
+ */
 export class Pipeline extends cdk.Stack {
   constructor(app: cdk.Construct, id: string, props: cdk.StackProps = {}) {
     super(app, id, props);

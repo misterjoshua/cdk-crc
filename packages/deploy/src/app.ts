@@ -9,5 +9,5 @@ const app = new cdk.App();
 // Development environment.
 new CdkCrcStage(app, 'CdkCrc-Dev');
 
-// CI/CD pipeline
+// Continuous Delivery pipeline
 new Pipeline(app, 'CdkCrc-Pipeline');

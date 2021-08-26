@@ -4,8 +4,13 @@ import { Cdn } from './components/cdn';
 import { Database } from './components/database';
 import { StaticSite } from './components/static-site';
 
+/**
+ * A CRC deployment stage with all resources for the environment.
+ */
 export class CdkCrcStage extends cdk.Stage {
+  /** Stack containing the stateful resources */
   public readonly statefulStack: cdk.Stack;
+  /** Stack containing the stateless resourcess */
   public readonly statelessStack: cdk.Stack;
 
   constructor(scope: cdk.Construct, id: string, props: cdk.StageProps = {}) {

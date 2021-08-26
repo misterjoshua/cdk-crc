@@ -4,8 +4,11 @@ import * as cdk from '@aws-cdk/core';
 import * as path from 'path';
 import { PACKAGES_BASE } from '../constants';
 
+/** Creates a bucket website and deploys the static site to it. */
 export class StaticSite extends cdk.Construct {
+  /** The bucket with the website */
   public readonly bucket: s3.Bucket;
+  /** The key prefix the site was uploaded into */
   public readonly bucketKeyPrefix?: string;
 
   constructor(scope: cdk.Construct, id: string) {

@@ -4,11 +4,15 @@ import * as cdk from '@aws-cdk/core';
 import { Api } from './api';
 import { StaticSite } from './static-site';
 
-interface CdnProps {
-  readonly staticSite: StaticSite;
+/** Props for `Cdn` */
+export interface CdnProps {
+  /** The API */
   readonly api: Api;
+  /** The static site */
+  readonly staticSite: StaticSite;
 }
 
+/** Create a CloudFront distribution exposing the static site and the API */
 export class Cdn extends cdk.Construct {
   public readonly distribution: cloudfront.Distribution;
 

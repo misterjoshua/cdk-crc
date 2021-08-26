@@ -7,11 +7,15 @@ import * as path from 'path';
 import { PACKAGES_BASE } from '../constants';
 import { Database } from './database';
 
-interface ApiProps {
+/** Props for `Api` */
+export interface ApiProps {
+  /** The database for the API */
   readonly database: Database;
 }
 
+/** Create an HTTP API */
 export class Api extends cdk.Construct {
+  /** The produced API Gateway */
   public readonly httpApi: apigwv2.HttpApi;
 
   constructor(scope: cdk.Construct, id: string, props: ApiProps) {
