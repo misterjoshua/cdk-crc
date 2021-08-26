@@ -31,7 +31,7 @@ export class Pipeline extends cdk.Stack {
       }),
 
       // Allow the pipeline to self-update from git.
-      selfMutation: false,
+      selfMutation: true,
 
       // Docker is used throughout.
       dockerEnabledForSynth: true,
