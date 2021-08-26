@@ -1,11 +1,11 @@
-import {Database} from "./database";
-import * as cdk from "@aws-cdk/core";
-import * as apigwv2 from "@aws-cdk/aws-apigatewayv2";
-import * as lambda_python from "@aws-cdk/aws-lambda-python";
-import * as path from "path";
-import {PACKAGES_BASE} from "../constants";
-import * as lambda from "@aws-cdk/aws-lambda";
-import * as apigwv2_integrations from "@aws-cdk/aws-apigatewayv2-integrations";
+import * as apigwv2 from '@aws-cdk/aws-apigatewayv2';
+import * as apigwv2_integrations from '@aws-cdk/aws-apigatewayv2-integrations';
+import * as lambda from '@aws-cdk/aws-lambda';
+import * as lambda_python from '@aws-cdk/aws-lambda-python';
+import * as cdk from '@aws-cdk/core';
+import * as path from 'path';
+import { PACKAGES_BASE } from '../constants';
+import { Database } from './database';
 
 interface ApiProps {
   readonly database: Database;

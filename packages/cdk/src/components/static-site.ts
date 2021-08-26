@@ -1,8 +1,8 @@
-import * as cdk from "@aws-cdk/core";
-import * as s3 from "@aws-cdk/aws-s3";
-import * as s3_deployment from "@aws-cdk/aws-s3-deployment";
-import * as path from "path";
-import {PACKAGES_BASE} from "../constants";
+import * as s3 from '@aws-cdk/aws-s3';
+import * as s3_deployment from '@aws-cdk/aws-s3-deployment';
+import * as cdk from '@aws-cdk/core';
+import * as path from 'path';
+import { PACKAGES_BASE } from '../constants';
 
 export class StaticSite extends cdk.Construct {
   public readonly bucket: s3.Bucket;

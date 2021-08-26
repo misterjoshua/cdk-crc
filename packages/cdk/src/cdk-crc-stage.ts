@@ -1,8 +1,8 @@
-import * as cdk from "@aws-cdk/core";
-import {Database} from "./components/database";
-import {StaticSite} from "./components/static-site";
-import {Api} from "./components/api";
-import {Cdn} from "./components/cdn";
+import * as cdk from '@aws-cdk/core';
+import { Api } from './components/api';
+import { Cdn } from './components/cdn';
+import { Database } from './components/database';
+import { StaticSite } from './components/static-site';
 
 export class CdkCrcStage extends cdk.Stage {
   public readonly statefulStack: cdk.Stack;

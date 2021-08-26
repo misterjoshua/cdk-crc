@@ -1,8 +1,8 @@
-import {StaticSite} from "./static-site";
-import {Api} from "./api";
-import * as cdk from "@aws-cdk/core";
-import * as cloudfront from "@aws-cdk/aws-cloudfront";
-import * as cloudfront_origins from "@aws-cdk/aws-cloudfront-origins";
+import * as cloudfront from '@aws-cdk/aws-cloudfront';
+import * as cloudfront_origins from '@aws-cdk/aws-cloudfront-origins';
+import * as cdk from '@aws-cdk/core';
+import { Api } from './api';
+import { StaticSite } from './static-site';
 
 interface CdnProps {
   readonly staticSite: StaticSite;
@@ -15,7 +15,7 @@ export class Cdn extends cdk.Construct {
   constructor(scope: cdk.Construct, id: string, props: CdnProps) {
     super(scope, id);
 
-    const {staticSite, api} = props;
+    const { staticSite, api } = props;
 
     this.distribution = new cloudfront.Distribution(this, 'Distribution', {
       // Connect the CDN to the static site bucket
@@ -38,9 +38,13 @@ export class Cdn extends cdk.Construct {
       '.amazonaws.com',
     ]);
 
-    this.distribution.addBehavior('/api/*', new cloudfront_origins.HttpOrigin(httpApiDomainName), {
-      viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-      cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
-    });
+    this.distribution.addBehavior(
+      '/api/*',
+      new cloudfront_origins.HttpOrigin(httpApiDomainName),
+      {
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
+      },
+    );
   }
 }

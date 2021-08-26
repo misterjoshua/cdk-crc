@@ -1,5 +1,5 @@
-import * as cdk from "@aws-cdk/core";
-import * as dynamodb from "@aws-cdk/aws-dynamodb";
+import * as dynamodb from '@aws-cdk/aws-dynamodb';
+import * as cdk from '@aws-cdk/core';
 
 export class Database extends cdk.Construct {
   public readonly table: dynamodb.Table;
