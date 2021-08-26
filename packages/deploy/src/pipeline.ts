@@ -13,9 +13,16 @@ export class Pipeline extends cdk.Stack {
     const pipeline = new CodePipeline(this, 'Pipeline', {
       synth: new ShellStep('Synth', {
         input: CodePipelineSource.gitHub('misterjoshua/cdk-crc', 'main'),
-        commands: ['yarn', 'yarn run build'],
+        commands: ['npm i -g yarn', 'yarn', 'yarn run build'],
         primaryOutputDirectory: 'packages/deploy/cdk.out',
       }),
+
+      // Allow the pipeline to self-update from git.
+      selfMutation: true,
+
+      // Docker is used throughout synths.
+      dockerEnabledForSynth: true,
+      dockerEnabledForSelfMutation: true,
     });
 
     pipeline.addStage(new CdkCrcStage(this, 'CdkCrc-Test'));
