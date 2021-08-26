@@ -1,0 +1,10 @@
+.idea
+.yarn
+*.lock
+*.d.ts
+.pnp.cjs
+
+packages/cdk/cdk.out
+
+packages/frontend/.next
+packages/frontend/out
