@@ -2,7 +2,7 @@
   "name": "root",
   "version": "0.0.0",
   "scripts": {
-    "build": "wsrun "
+    "build": "lerna run build"
   },
   "workspaces": [
     "packages/*"

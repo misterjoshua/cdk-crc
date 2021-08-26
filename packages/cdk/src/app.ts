@@ -5,5 +5,4 @@ import { CdkCrcStage } from './cdk-crc-stage';
 
 const app = new cdk.App();
 
-// TODO: change to CdkCrc-Dev
-new CdkCrcStage(app, 'CdcCrc-Dev');
+new CdkCrcStage(app, 'CdkCrc-Dev');
