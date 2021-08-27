@@ -1,7 +1,5 @@
 import * as AWS from 'aws-sdk';
 
-const TEST_TABLE_NAME = 'TEST_TABLE';
-
 export function getDynamoDB(): AWS.DynamoDB {
   return new AWS.DynamoDB({
     endpoint: 'http://localhost:4566',
@@ -13,33 +11,26 @@ export function getDynamoDB(): AWS.DynamoDB {
   });
 }
 
-export async function setupTable(dynamoDB: AWS.DynamoDB) {
-  try {
-    // This will throw if the table oes not exist.
-    await dynamoDB
-      .describeTable({
-        TableName: TEST_TABLE_NAME,
-      })
-      .promise();
+export async function initTable(dynamoDB: AWS.DynamoDB, tableName: string) {
+  async function hasTable(tableName: string) {
+    const listTablesResponse = await dynamoDB.listTables().promise();
+    return !!listTablesResponse.TableNames?.some((t) => t === tableName);
+  }
 
+  if (await hasTable(tableName)) {
     await dynamoDB
       .deleteTable({
-        TableName: TEST_TABLE_NAME,
+        TableName: tableName,
       })
       .promise();
 
-    while (true) {
-      // It'll throw when it's done.
-      await dynamoDB
-        .describeTable({
-          TableName: TEST_TABLE_NAME,
-        })
-        .promise();
-    }
+    for (let times = 0; times < 100; times++) {
+      if (!(await hasTable(tableName))) {
+        break;
+      }
 
-    // NOTREACHED
-  } catch {
-    // Do nothing. This is actually the expected case.
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
   }
 
   await dynamoDB
@@ -65,9 +56,9 @@ export async function setupTable(dynamoDB: AWS.DynamoDB) {
           AttributeType: 'S',
         },
       ],
-      TableName: TEST_TABLE_NAME,
+      TableName: tableName,
     })
     .promise();
 
-  return TEST_TABLE_NAME;
+  return tableName;
 }

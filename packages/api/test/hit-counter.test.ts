@@ -1,64 +1,86 @@
-import type * as AWS from 'aws-sdk';
 import { HitCounter } from '../src/hit-counter';
-import { getDynamoDB, setupTable } from './dynamodb-setup';
+import { getDynamoDB, initTable } from './dynamodb-init';
+
+const TEST_TABLE_NAME = 'TEST_TABLE';
+
+const dynamoDB = getDynamoDB();
+beforeEach(async () => {
+  await initTable(dynamoDB, TEST_TABLE_NAME);
+});
 
 test('setupTable', async () => {
-  const dynamoDB = getDynamoDB();
-  const tableName = await setupTable(dynamoDB);
-
   const tables = await dynamoDB.listTables().promise();
-  expect(tables.TableNames).toEqual(expect.arrayContaining([tableName]));
-}, 30000);
+  expect(tables.TableNames).toEqual(expect.arrayContaining([TEST_TABLE_NAME]));
 
-let dynamoDB: undefined | AWS.DynamoDB;
-let tableName: undefined | string;
-beforeEach(async () => {
-  dynamoDB = await getDynamoDB();
-  tableName = await setupTable(dynamoDB);
-});
+  const items = await dynamoDB
+    .scan({
+      TableName: TEST_TABLE_NAME,
+    })
+    .promise();
+
+  expect(items.Items?.length).toEqual(0);
+}, 30000);
 
 describe('HitCounter.optimisticallyLocking', () => {
   test('first hit', async () => {
+    // GIVEN
     const hitCounter = HitCounter.optimisticallyLocking({
-      tableName: tableName!,
-      dynamoDB: dynamoDB!,
+      tableName: TEST_TABLE_NAME,
+      dynamoDB: dynamoDB,
     });
 
+    // WHEN
     const hitCount = await hitCounter.hit();
+
+    // THEN
     expect(hitCount).toEqual(1);
   });
 
   test('second hit', async () => {
+    // GIVEN
     const hitCounter = HitCounter.optimisticallyLocking({
-      tableName: tableName!,
-      dynamoDB: dynamoDB!,
+      tableName: TEST_TABLE_NAME,
+      dynamoDB: dynamoDB,
     });
 
-    await hitCounter.hit();
+    await hitCounter.hit(); // First hit
+
+    // WHEN
     const hitCount = await hitCounter.hit();
+
+    // THEN
     expect(hitCount).toEqual(2);
   });
 });
 
 describe('HitCounter.expressionIncrementing', () => {
   test('first hit', async () => {
+    // GIVEN
     const hitCounter = HitCounter.expressionIncrementing({
-      tableName: tableName!,
-      dynamoDB: dynamoDB!,
+      tableName: TEST_TABLE_NAME,
+      dynamoDB: dynamoDB,
     });
 
+    // WHEN
     const hitCount = await hitCounter.hit();
+
+    // THEN
     expect(hitCount).toEqual(1);
   });
 
   test('second hit', async () => {
+    // GIVEN
     const hitCounter = HitCounter.expressionIncrementing({
-      tableName: tableName!,
-      dynamoDB: dynamoDB!,
+      tableName: TEST_TABLE_NAME,
+      dynamoDB: dynamoDB,
     });
 
-    await hitCounter.hit();
+    await hitCounter.hit(); // First hit
+
+    // WHEN
     const hitCount = await hitCounter.hit();
+
+    // THEN
     expect(hitCount).toEqual(2);
   });
 });
