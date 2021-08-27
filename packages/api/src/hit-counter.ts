@@ -1,10 +1,5 @@
 import type { DynamoDB } from 'aws-sdk';
 
-export interface HitCounterOptions {
-  readonly dynamoDB: DynamoDB;
-  readonly tableName: string;
-}
-
 export abstract class HitCounter {
   static optimisticallyLocking(options: HitCounterOptions): HitCounter {
     return new OptimisticLockingHitCounter(options);
@@ -14,6 +9,15 @@ export abstract class HitCounter {
     return new ExpressionIncrementingHitCounter(options);
   }
 
+  abstract hit(): Promise<number>;
+}
+
+export interface HitCounterOptions {
+  readonly dynamoDB: DynamoDB;
+  readonly tableName: string;
+}
+
+abstract class BaseHitCounter extends HitCounter {
   protected readonly key: DynamoDB.Key = {
     PK: { S: 'HIT_COUNTER' },
     SK: { S: 'HIT_COUNTER' },
@@ -24,6 +28,7 @@ export abstract class HitCounter {
   protected readonly tableName: string;
 
   protected constructor(options: HitCounterOptions) {
+    super();
     this.dynamoDB = options.dynamoDB;
     this.tableName = options.tableName;
   }
@@ -31,7 +36,7 @@ export abstract class HitCounter {
   abstract hit(): Promise<number>;
 }
 
-class ExpressionIncrementingHitCounter extends HitCounter {
+class ExpressionIncrementingHitCounter extends BaseHitCounter {
   constructor(options: HitCounterOptions) {
     super(options);
   }
@@ -62,7 +67,7 @@ class ExpressionIncrementingHitCounter extends HitCounter {
   }
 }
 
-class OptimisticLockingHitCounter extends HitCounter {
+class OptimisticLockingHitCounter extends BaseHitCounter {
   constructor(options: HitCounterOptions) {
     super(options);
   }
