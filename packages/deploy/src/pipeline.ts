@@ -29,7 +29,8 @@ export class Pipeline extends cdk.Stack {
             connectionArn,
           },
         ),
-        commands: ['npm i -g yarn', 'yarn', 'yarn run build'],
+        installCommands: ['bash pipeline-setup.sh'],
+        commands: ['yarn build'],
         primaryOutputDirectory: 'packages/deploy/cdk.out',
       }),
 

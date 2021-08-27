@@ -1,0 +1,30 @@
+x-wait-for-localstack-script: &x-wait-for-localstack-script |
+  export AWS_ACCESS_KEY_ID=fake
+  export AWS_SECRET_ACCESS_KEY=fake
+  export AWS_DEFAULT_REGION=us-east-1
+
+  TRIES=1
+  MAX_TRIES=60
+  while ! timeout 1 aws --endpoint-url http://localstack:4566 dynamodb list-tables; do
+    if ((TRIES >= MAX_TRIES)); then
+      echo "Timed out"
+      exit 1
+    fi
+    let TRIES++
+    echo "Trying to connect"
+    sleep 1
+  done
+
+services:
+  localstack:
+    image: localstack/localstack
+    ports:
+      - 4566:4566
+      - 4571:4571
+    environment:
+      LOCALSTACK_SERVICES: dynamodb
+
+  localstack_waiter:
+    image: amazon/aws-cli
+    entrypoint: ['/bin/bash', '-c']
+    command: [*x-wait-for-localstack-script]
