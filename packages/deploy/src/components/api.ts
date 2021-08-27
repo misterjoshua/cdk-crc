@@ -30,7 +30,13 @@ export class Api extends cdk.Construct {
 
     props.database.table.grantReadWriteData(hitsHandler);
 
-    this.httpApi = new apigwv2.HttpApi(this, 'HttpApi');
+    this.httpApi = new apigwv2.HttpApi(this, 'HttpApi', {
+      corsPreflight: {
+        allowOrigins: ['*'],
+        allowMethods: [apigwv2.CorsHttpMethod.ANY],
+        maxAge: cdk.Duration.days(10),
+      },
+    });
 
     new apigwv2.HttpRoute(this, 'Hits', {
       httpApi: this.httpApi,
