@@ -49,7 +49,7 @@ export class CdkCrcStage extends cdk.Stage {
       value: cdk.Fn.join('', [
         'https://',
         cdn.distribution.distributionDomainName,
-        '/api/something',
+        '/api/hits',
       ]),
     });
   }
