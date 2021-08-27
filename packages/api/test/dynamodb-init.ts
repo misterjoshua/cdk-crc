@@ -24,7 +24,12 @@ export async function initTable(dynamoDB: AWS.DynamoDB, tableName: string) {
       })
       .promise();
 
-    for (let times = 0; times < 100; times++) {
+    const timeout = Date.now() + 10000;
+    while (true) {
+      if (Date.now() > timeout) {
+        throw new Error('Timed out waiting for the table to clean up');
+      }
+
       if (!(await hasTable(tableName))) {
         break;
       }
