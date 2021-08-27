@@ -7,46 +7,32 @@ test('database is unchanged', () => {
   const stage = new CdkCrcStage(app, 'Stage');
 
   const assert = Template.fromStack(stage.statefulStack);
-  assert.templateMatches({
-    Resources: {
-      DatabaseTableF104A135: {
-        Type: 'AWS::DynamoDB::Table',
-        Properties: {
-          KeySchema: [
-            {
-              AttributeName: 'PK',
-              KeyType: 'HASH',
-            },
-            {
-              AttributeName: 'SK',
-              KeyType: 'RANGE',
-            },
-          ],
-          AttributeDefinitions: [
-            {
-              AttributeName: 'PK',
-              AttributeType: 'S',
-            },
-            {
-              AttributeName: 'SK',
-              AttributeType: 'S',
-            },
-          ],
-          BillingMode: 'PAY_PER_REQUEST',
+  assert.hasResource('AWS::DynamoDB::Table', {
+    Type: 'AWS::DynamoDB::Table',
+    Properties: {
+      KeySchema: [
+        {
+          AttributeName: 'PK',
+          KeyType: 'HASH',
         },
-        UpdateReplacePolicy: 'Delete',
-        DeletionPolicy: 'Delete',
-      },
+        {
+          AttributeName: 'SK',
+          KeyType: 'RANGE',
+        },
+      ],
+      AttributeDefinitions: [
+        {
+          AttributeName: 'PK',
+          AttributeType: 'S',
+        },
+        {
+          AttributeName: 'SK',
+          AttributeType: 'S',
+        },
+      ],
+      BillingMode: 'PAY_PER_REQUEST',
     },
-    Outputs: {
-      ExportsOutputFnGetAttDatabaseTableF104A135ArnDAC15A6A: {
-        Value: {
-          'Fn::GetAtt': ['DatabaseTableF104A135', 'Arn'],
-        },
-        Export: {
-          Name: 'Stage-Stateful:StatefulExportsOutputFnGetAttDatabaseTableF104A135ArnE91FEB90',
-        },
-      },
-    },
+    UpdateReplacePolicy: 'Delete',
+    DeletionPolicy: 'Delete',
   });
 });
