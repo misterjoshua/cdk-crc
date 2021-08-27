@@ -211,7 +211,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-cdk/aws-certificatemanager@npm:1.120.0":
+"@aws-cdk/aws-certificatemanager@npm:1.120.0, @aws-cdk/aws-certificatemanager@npm:^1.120.0":
   version: 1.120.0
   resolution: "@aws-cdk/aws-certificatemanager@npm:1.120.0"
   dependencies:
@@ -1015,7 +1015,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-cdk/aws-route53-targets@npm:1.120.0":
+"@aws-cdk/aws-route53-targets@npm:1.120.0, @aws-cdk/aws-route53-targets@npm:^1.120.0":
   version: 1.120.0
   resolution: "@aws-cdk/aws-route53-targets@npm:1.120.0"
   dependencies:
@@ -1050,7 +1050,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-cdk/aws-route53@npm:1.120.0":
+"@aws-cdk/aws-route53@npm:1.120.0, @aws-cdk/aws-route53@npm:^1.120.0":
   version: 1.120.0
   resolution: "@aws-cdk/aws-route53@npm:1.120.0"
   dependencies:
@@ -1282,7 +1282,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-cdk/aws-ssm@npm:1.120.0":
+"@aws-cdk/aws-ssm@npm:1.120.0, @aws-cdk/aws-ssm@npm:^1.20.0":
   version: 1.120.0
   resolution: "@aws-cdk/aws-ssm@npm:1.120.0"
   dependencies:
@@ -6033,14 +6033,18 @@ __metadata:
     "@aws-cdk/assertions": ^1.120.0
     "@aws-cdk/aws-apigatewayv2": ^1.120.0
     "@aws-cdk/aws-apigatewayv2-integrations": ^1.120.0
+    "@aws-cdk/aws-certificatemanager": ^1.120.0
     "@aws-cdk/aws-cloudfront": ^1.120.0
     "@aws-cdk/aws-cloudfront-origins": ^1.120.0
     "@aws-cdk/aws-codepipeline": ^1.120.0
     "@aws-cdk/aws-dynamodb": ^1.120.0
     "@aws-cdk/aws-lambda": ^1.120.0
     "@aws-cdk/aws-lambda-python": ^1.120.0
+    "@aws-cdk/aws-route53": ^1.120.0
+    "@aws-cdk/aws-route53-targets": ^1.120.0
     "@aws-cdk/aws-s3": ^1.120.0
     "@aws-cdk/aws-s3-deployment": ^1.120.0
+    "@aws-cdk/aws-ssm": ^1.20.0
     "@aws-cdk/core": 1.120.0
     "@aws-cdk/pipelines": ^1.120.0
     "@types/jest": ^26.0.10

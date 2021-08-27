@@ -6,6 +6,9 @@ import {
 } from '@aws-cdk/pipelines';
 import { CdkCrcStage } from './cdk-crc-stage';
 import {
+  DOMAIN_CERT_PARAM,
+  DOMAIN_NAME,
+  DOMAIN_ZONE_ID_PARAM,
   PIPELINE_CONNECTION_ID,
   PIPELINE_REPO,
   PIPELINE_REPO_BRANCH,
@@ -42,6 +45,14 @@ export class Pipeline extends cdk.Stack {
       dockerEnabledForSelfMutation: true,
     });
 
-    pipeline.addStage(new CdkCrcStage(this, 'CdkCrc-Test'));
+    pipeline.addStage(
+      new CdkCrcStage(this, 'CdkCrc-Test', {
+        domainConfig: {
+          certificateParameter: DOMAIN_CERT_PARAM,
+          domainNames: [`cdk-crc-test.${DOMAIN_NAME}`],
+          hostedZoneIdParameter: DOMAIN_ZONE_ID_PARAM,
+        },
+      }),
+    );
   }
 }

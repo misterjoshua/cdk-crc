@@ -2,7 +2,17 @@ import * as cdk from '@aws-cdk/core';
 import { Api } from './components/api';
 import { Cdn } from './components/cdn';
 import { Database } from './components/database';
+import { Dns } from './components/dns';
+import { DomainConfig } from './components/domain-config';
 import { StaticSite } from './components/static-site';
+
+/**
+ * Props for `CdkCrcStage`
+ */
+export interface CdkCrcStageProps extends cdk.StageProps {
+  /** Optional domain configuration. */
+  readonly domainConfig?: DomainConfig;
+}
 
 /**
  * A CRC deployment stage with all resources for the environment.
@@ -10,10 +20,10 @@ import { StaticSite } from './components/static-site';
 export class CdkCrcStage extends cdk.Stage {
   /** Stack containing the stateful resources */
   public readonly statefulStack: cdk.Stack;
-  /** Stack containing the stateless resourcess */
+  /** Stack containing the stateless resources */
   public readonly statelessStack: cdk.Stack;
 
-  constructor(scope: cdk.Construct, id: string, props: cdk.StageProps = {}) {
+  constructor(scope: cdk.Construct, id: string, props: CdkCrcStageProps = {}) {
     super(scope, id, props);
 
     // Stateful resources:
@@ -32,6 +42,12 @@ export class CdkCrcStage extends cdk.Stage {
     const cdn = new Cdn(this.statelessStack, 'Cdn', {
       api,
       staticSite,
+      domainConfig: props.domainConfig,
+    });
+    // Configure DNS
+    const dns = new Dns(this.statelessStack, 'Dns', {
+      cdn,
+      domainConfig: props.domainConfig,
     });
 
     // Show me things about the system.
@@ -39,18 +55,10 @@ export class CdkCrcStage extends cdk.Stage {
       value: cdn.distribution.distributionId,
     });
     new cdk.CfnOutput(this.statelessStack, 'HomeLink', {
-      value: cdk.Fn.join('', [
-        'https://',
-        cdn.distribution.distributionDomainName,
-        '/',
-      ]),
+      value: cdk.Fn.join('', ['https://', dns.mainDomain, '/']),
     });
     new cdk.CfnOutput(this.statelessStack, 'ApiLink', {
-      value: cdk.Fn.join('', [
-        'https://',
-        cdn.distribution.distributionDomainName,
-        '/api/hits',
-      ]),
+      value: cdk.Fn.join('', ['https://', dns.mainDomain, '/api/hits']),
     });
   }
 }
