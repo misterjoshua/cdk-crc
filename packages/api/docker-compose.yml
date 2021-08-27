@@ -1,0 +1,8 @@
+services:
+  localstack:
+    image: localstack/localstack
+    ports:
+      - 4566:4566
+      - 4571:4571
+    environment:
+      LOCALSTACK_SERVICES: dynamodb

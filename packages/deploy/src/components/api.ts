@@ -1,10 +1,8 @@
 import * as apigwv2 from '@aws-cdk/aws-apigatewayv2';
 import * as apigwv2_integrations from '@aws-cdk/aws-apigatewayv2-integrations';
 import * as lambda from '@aws-cdk/aws-lambda';
-import * as lambda_python from '@aws-cdk/aws-lambda-python';
 import * as cdk from '@aws-cdk/core';
-import * as path from 'path';
-import { PACKAGES_BASE } from '../constants';
+import * as api from 'api';
 import { Database } from './database';
 
 /** Props for `Api` */
@@ -21,17 +19,24 @@ export class Api extends cdk.Construct {
   constructor(scope: cdk.Construct, id: string, props: ApiProps) {
     super(scope, id);
 
-    const handler = new lambda_python.PythonFunction(this, 'Handler', {
-      entry: path.join(PACKAGES_BASE, 'api'),
-      handler: 'hello',
-      runtime: lambda.Runtime.PYTHON_3_8,
+    const hitsHandler = new lambda.Function(this, 'Handler', {
+      code: lambda.Code.fromAsset(api.getAssetDir()),
+      runtime: lambda.Runtime.NODEJS_14_X,
+      handler: 'functions/hits.handler',
+      environment: {
+        [api.FUNCTION_DATABASE_ENV_NAME]: props.database.table.tableName,
+      },
     });
 
-    props.database.table.grantReadWriteData(handler);
+    props.database.table.grantReadWriteData(hitsHandler);
 
-    this.httpApi = new apigwv2.HttpApi(this, 'HttpApi', {
-      defaultIntegration: new apigwv2_integrations.LambdaProxyIntegration({
-        handler,
+    this.httpApi = new apigwv2.HttpApi(this, 'HttpApi');
+
+    new apigwv2.HttpRoute(this, 'Hits', {
+      httpApi: this.httpApi,
+      routeKey: apigwv2.HttpRouteKey.with('/api/hits'),
+      integration: new apigwv2_integrations.LambdaProxyIntegration({
+        handler: hitsHandler,
       }),
     });
   }
