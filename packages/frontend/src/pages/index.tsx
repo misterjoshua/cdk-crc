@@ -6,8 +6,6 @@ export default function Home() {
       <h1>Cloud Resume Challenge</h1>
       <p>Welcome to my Cloud Resume Challenge, prepared in CDK.</p>
 
-      <HitCounter />
-
       <section>
         <h2>ABOUT ME</h2>
         <p>
@@ -216,6 +214,11 @@ export default function Home() {
           </ul>
         </section>
       </section>
+
+      <p>
+        <HitCounter />
+        &nbsp;
+      </p>
     </>
   );
 }
