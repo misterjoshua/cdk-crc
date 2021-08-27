@@ -3,14 +3,14 @@ import * as AWS from 'aws-sdk';
 import { FUNCTION_DATABASE_ENV_NAME } from '../constants';
 import { HitCounter } from '../hit-counter';
 
+const tableName = getDatabaseTableName();
+const dynamoDB = new AWS.DynamoDB();
+
 export async function handler(
   event: lambda.APIGatewayProxyEventV2,
   _context: unknown,
 ): Promise<lambda.APIGatewayProxyResultV2> {
-  const tableName = getDatabaseTableName();
-  const dynamoDB = new AWS.DynamoDB();
-
-  const hitCounter = new HitCounter({
+  const hitCounter = HitCounter.expressionIncrementing({
     dynamoDB,
     tableName,
   });

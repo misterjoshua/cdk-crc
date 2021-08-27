@@ -5,19 +5,66 @@ export interface HitCounterOptions {
   readonly tableName: string;
 }
 
-export class HitCounter {
-  private readonly dynamoDB: DynamoDB;
-  private readonly tableName: string;
+export abstract class HitCounter {
+  static optimisticallyLocking(options: HitCounterOptions): HitCounter {
+    return new OptimisticLockingHitCounter(options);
+  }
 
-  private readonly key: DynamoDB.Key = {
+  static expressionIncrementing(options: HitCounterOptions): HitCounter {
+    return new ExpressionIncrementingHitCounter(options);
+  }
+
+  protected readonly key: DynamoDB.Key = {
     PK: { S: 'HIT_COUNTER' },
     SK: { S: 'HIT_COUNTER' },
   };
-  private readonly attributeName = 'HitCount';
+  protected readonly attributeName = 'HitCount';
 
-  constructor(options: HitCounterOptions) {
+  protected readonly dynamoDB: DynamoDB;
+  protected readonly tableName: string;
+
+  protected constructor(options: HitCounterOptions) {
     this.dynamoDB = options.dynamoDB;
     this.tableName = options.tableName;
+  }
+
+  abstract hit(): Promise<number>;
+}
+
+class ExpressionIncrementingHitCounter extends HitCounter {
+  constructor(options: HitCounterOptions) {
+    super(options);
+  }
+
+  async hit(): Promise<number> {
+    const item = await this.dynamoDB
+      .updateItem({
+        TableName: this.tableName,
+        Key: this.key,
+        ReturnValues: 'UPDATED_NEW',
+        UpdateExpression:
+          'SET #HitCount = if_not_exists(#HitCount, :Initial) + :Increment',
+        ExpressionAttributeNames: {
+          '#HitCount': this.attributeName,
+        },
+        ExpressionAttributeValues: {
+          ':Initial': { N: '0' },
+          ':Increment': { N: '1' },
+        },
+      })
+      .promise();
+
+    if (item.Attributes && item.Attributes[this.attributeName]) {
+      return parseInt(item.Attributes[this.attributeName].N ?? '1');
+    } else {
+      return 1;
+    }
+  }
+}
+
+class OptimisticLockingHitCounter extends HitCounter {
+  constructor(options: HitCounterOptions) {
+    super(options);
   }
 
   async hit(): Promise<number> {

@@ -32,18 +32,22 @@ export class CdkCrcStage extends cdk.Stage {
 
     // Stateless resources:
     this.statelessStack = new cdk.Stack(this, 'Stateless');
+
     // Deploy the static site
     const staticSite = new StaticSite(this.statelessStack, 'StaticSite');
+
     // Deploy the api
     const api = new Api(this.statelessStack, 'Api', {
       database,
     });
+
     // Front the static site and api with a CDN
     const cdn = new Cdn(this.statelessStack, 'Cdn', {
       api,
       staticSite,
       domainConfig: props.domainConfig,
     });
+
     // Configure DNS
     const dns = new Dns(this.statelessStack, 'Dns', {
       cdn,
@@ -51,9 +55,6 @@ export class CdkCrcStage extends cdk.Stage {
     });
 
     // Show me things about the system.
-    new cdk.CfnOutput(this.statelessStack, 'DistributionId', {
-      value: cdn.distribution.distributionId,
-    });
     new cdk.CfnOutput(this.statelessStack, 'HomeLink', {
       value: cdk.Fn.join('', ['https://', dns.mainDomain, '/']),
     });
