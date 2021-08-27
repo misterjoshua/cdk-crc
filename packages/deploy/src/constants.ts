@@ -1,5 +1,6 @@
 import * as path from 'path';
 
+/** Base directory for the 'packages' directory. */
 export const PACKAGES_BASE = path.join(__dirname, '..', '..');
 
 // Change the following for your pipeline:
@@ -13,5 +14,7 @@ export const PIPELINE_REPO_BRANCH = 'main';
 
 /** Domain name */
 export const DOMAIN_NAME = 'kellendonk.ca';
+/** SSM parameter containing the arn for an acm cert in us-east-1 */
 export const DOMAIN_CERT_PARAM = `/${DOMAIN_NAME}/certificate-arn`;
+/** Hosted zone id for the domain */
 export const DOMAIN_ZONE_ID_PARAM = `/${DOMAIN_NAME}/hosted-zone-id`;
