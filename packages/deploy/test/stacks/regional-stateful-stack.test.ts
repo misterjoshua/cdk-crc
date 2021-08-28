@@ -1,12 +1,12 @@
 import { Template } from '@aws-cdk/assertions';
 import * as cdk from '@aws-cdk/core';
-import { CdkCrcStage } from '../src/cdk-crc-stage';
+import { RegionalStatefulStack } from '../../src/stacks/regional-stateful-stack';
 
 test('database is unchanged', () => {
   const app = new cdk.App();
-  const stage = new CdkCrcStage(app, 'Stage');
+  const stack = new RegionalStatefulStack(app, 'Stage');
 
-  const assert = Template.fromStack(stage.regionalStatefulStack);
+  const assert = Template.fromStack(stack);
   assert.hasResource('AWS::DynamoDB::Table', {
     Type: 'AWS::DynamoDB::Table',
     Properties: {
