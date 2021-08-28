@@ -47,6 +47,10 @@ export class Pipeline extends cdk.Stack {
 
     pipeline.addStage(
       new CdkCrcStage(this, 'CdkCrc-Test', {
+        env: {
+          account: this.account,
+          region: this.region,
+        },
         domainConfig: {
           certificateParameter: DOMAIN_CERT_PARAM,
           domainNames: [`cdk-crc-test.${DOMAIN_NAME}`],
