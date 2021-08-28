@@ -11,8 +11,11 @@ import { Pipeline } from './pipeline';
 
 const app = new cdk.App();
 
-// Development environment.
 new CdkCrcStage(app, 'CdkCrc-Dev', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION,
+  },
   domainConfig: {
     certificateParameter: DOMAIN_CERT_PARAM,
     domainNames: [`cdk-crc-dev.${DOMAIN_NAME}`],
@@ -21,4 +24,9 @@ new CdkCrcStage(app, 'CdkCrc-Dev', {
 });
 
 // Continuous Delivery pipeline
-new Pipeline(app, 'CdkCrc-Pipeline');
+new Pipeline(app, 'CdkCrc-Pipeline', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION,
+  },
+});

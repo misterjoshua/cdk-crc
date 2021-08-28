@@ -6,7 +6,7 @@ test('database is unchanged', () => {
   const app = new cdk.App();
   const stage = new CdkCrcStage(app, 'Stage');
 
-  const assert = Template.fromStack(stage.statefulStack);
+  const assert = Template.fromStack(stage.regionalStatefulStack);
   assert.hasResource('AWS::DynamoDB::Table', {
     Type: 'AWS::DynamoDB::Table',
     Properties: {
