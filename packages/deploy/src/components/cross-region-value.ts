@@ -26,6 +26,8 @@ export type CrossRegionValueProducer<ValueType, PropsType> = (
   props: PropsType,
 ) => ValueType;
 
+export type CrossRegionStringValueProps = { value: string };
+
 /**
  * Restores a value across stacks and possibly regions.
  */
@@ -34,11 +36,15 @@ export class CrossRegionValue<
   PropsType extends object,
 > extends cdk.Construct {
   public static fromString(scope: cdk.Construct, id: string, value: string) {
-    return new CrossRegionValue(scope, id, {
-      value,
-      props: { value },
-      produce: (_scope, _id, props) => props.value,
-    });
+    return new CrossRegionValue<string, CrossRegionStringValueProps>(
+      scope,
+      id,
+      {
+        value,
+        props: { value },
+        produce: (_scope, _id, props) => props.value,
+      },
+    );
   }
 
   public static fromS3Bucket(

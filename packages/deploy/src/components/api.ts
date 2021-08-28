@@ -6,7 +6,10 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import * as cdk from '@aws-cdk/core';
 import * as api from 'api';
 import { ICdnBehaviorOptions } from './cdn';
-import { CrossRegionValue } from './cross-region-value';
+import {
+  CrossRegionStringValueProps,
+  CrossRegionValue,
+} from './cross-region-value';
 import { Database } from './database';
 
 /** Props for `Api` */
@@ -20,9 +23,9 @@ export class Api extends cdk.Construct implements ICdnBehaviorOptions {
   /** The produced API Gateway */
   public readonly httpApi: apigwv2.HttpApi;
 
-  private readonly httpApiDomainName: CrossRegionValue<
+  private httpApiDomainName: CrossRegionValue<
     string,
-    { value: string }
+    CrossRegionStringValueProps
   >;
 
   constructor(scope: cdk.Construct, id: string, props: ApiProps) {
