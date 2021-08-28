@@ -1,6 +1,7 @@
 import * as cdk from '@aws-cdk/core';
 import { Database } from '../components/database';
 
+/** A stack holding data in a region. */
 export class RegionalStatefulStack extends cdk.Stack {
   public readonly database: Database;
 

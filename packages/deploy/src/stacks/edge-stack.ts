@@ -8,10 +8,13 @@ import { StaticSite } from '../components/static-site';
 interface EdgeStackProps extends cdk.StackProps {
   readonly domainConfig?: DomainConfig;
   readonly regionalApi: Api;
+  readonly regionalStaticSite: StaticSite;
 }
 
 /** Creates a stack for resources in us-east-1 */
 export class EdgeStack extends cdk.Stack {
+  public readonly cdn: Cdn;
+
   constructor(scope: cdk.Construct, id: string, props: EdgeStackProps) {
     super(scope, id, {
       ...props,
@@ -22,7 +25,7 @@ export class EdgeStack extends cdk.Stack {
     const staticSite = new StaticSite(this, 'StaticSite');
 
     // Front the static site and api with a CDN
-    const cdn = new Cdn(this, 'Cdn', {
+    this.cdn = new Cdn(this, 'Cdn', {
       domainConfig: props.domainConfig,
       defaultBehavior: staticSite,
       behaviors: [{ path: '/api/*', cdnBehaviorOptions: props.regionalApi }],
@@ -30,7 +33,7 @@ export class EdgeStack extends cdk.Stack {
 
     // Configure DNS
     const dns = new Dns(this, 'Dns', {
-      cdn,
+      cdn: this.cdn,
       domainConfig: props.domainConfig,
     });
 

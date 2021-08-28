@@ -45,6 +45,7 @@ export class CdkCrcStage extends cdk.Stage {
     new EdgeStack(this, 'Edge', {
       domainConfig: props.domainConfig,
       regionalApi: regionalStatelessStack.regionalApi,
+      regionalStaticSite: regionalStatelessStack.staticSite,
     });
   }
 }

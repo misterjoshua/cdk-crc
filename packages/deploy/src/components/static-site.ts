@@ -7,6 +7,7 @@ import * as s3bng from 'cdk-s3bucket-ng';
 import * as path from 'path';
 import { PACKAGES_BASE } from '../constants';
 import { ICdnBehaviorOptions } from './cdn';
+import { CrossRegionValue } from './cross-region-value';
 
 /** Creates a bucket website and deploys the static site to it. */
 export class StaticSite extends cdk.Construct implements ICdnBehaviorOptions {
@@ -14,6 +15,8 @@ export class StaticSite extends cdk.Construct implements ICdnBehaviorOptions {
   public readonly bucket: s3.Bucket;
   /** The key prefix the site was uploaded into */
   public readonly bucketKeyPrefix?: string;
+
+  private crossRegionBucket: CrossRegionValue<s3.IBucket, s3.BucketAttributes>;
 
   constructor(scope: cdk.Construct, id: string) {
     super(scope, id);
@@ -35,11 +38,19 @@ export class StaticSite extends cdk.Construct implements ICdnBehaviorOptions {
         s3_deployment.Source.asset(path.join(PACKAGES_BASE, 'frontend', 'out')),
       ],
     });
+
+    this.crossRegionBucket = CrossRegionValue.fromS3Bucket(
+      this,
+      'CrossRegionStaticSitebucket',
+      this.bucket,
+    );
   }
 
   public cdnBehaviorOptions(scope: cdk.Construct): cloudfront.BehaviorOptions {
+    const bucket = this.crossRegionBucket.getValueInScope(scope);
+
     return {
-      origin: new cloudfront_origins.S3Origin(this.bucket, {
+      origin: new cloudfront_origins.S3Origin(bucket, {
         originPath: this.bucketKeyPrefix,
       }),
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,

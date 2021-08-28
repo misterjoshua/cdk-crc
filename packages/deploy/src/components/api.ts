@@ -5,8 +5,8 @@ import * as cloudfront_origins from '@aws-cdk/aws-cloudfront-origins';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as cdk from '@aws-cdk/core';
 import * as api from 'api';
-import * as crs from 'cdk-remote-stack';
 import { ICdnBehaviorOptions } from './cdn';
+import { CrossRegionValue } from './cross-region-value';
 import { Database } from './database';
 
 /** Props for `Api` */
@@ -20,8 +20,10 @@ export class Api extends cdk.Construct implements ICdnBehaviorOptions {
   /** The produced API Gateway */
   public readonly httpApi: apigwv2.HttpApi;
 
-  /** Output name for cross-region references */
-  private readonly httpApiDomainNameOutputName: string;
+  private readonly httpApiDomainName: CrossRegionValue<
+    string,
+    { value: string }
+  >;
 
   constructor(scope: cdk.Construct, id: string, props: ApiProps) {
     super(scope, id);
@@ -53,19 +55,16 @@ export class Api extends cdk.Construct implements ICdnBehaviorOptions {
       }),
     });
 
-    this.httpApiDomainNameOutputName =
-      this.uniqueSuffixedId('HttpApiDomainName');
-    new cdk.CfnOutput(cdk.Stack.of(this), this.httpApiDomainNameOutputName, {
-      value: renderExecuteApiDomain(this.httpApi),
-    });
-  }
-
-  private uniqueSuffixedId(suffix: string = ''): string {
-    return `${cdk.Names.uniqueId(this)}${suffix}`;
+    const httpApiDomainName = renderExecuteApiDomain(this.httpApi);
+    this.httpApiDomainName = CrossRegionValue.fromString(
+      this,
+      'HttpApiDomainName',
+      httpApiDomainName,
+    );
   }
 
   cdnBehaviorOptions(scope: cdk.Construct): cloudfront.BehaviorOptions {
-    const httpApiDomainName = this.getHttpApiDomainName(scope);
+    const httpApiDomainName = this.httpApiDomainName.getValueInScope(scope);
 
     return {
       origin: new cloudfront_origins.HttpOrigin(httpApiDomainName),
@@ -76,34 +75,7 @@ export class Api extends cdk.Construct implements ICdnBehaviorOptions {
 
   /** Look up the HTTP API Domain Name */
   public getHttpApiDomainName(scope: cdk.Construct): string {
-    const apiStack = cdk.Stack.of(this);
-    const scopeStack = cdk.Stack.of(scope);
-
-    if (apiStack === scopeStack) {
-      // When the API and given scope are in the same stack, it's safe to use
-      // the API's values directly.
-      return renderExecuteApiDomain(this.httpApi);
-    }
-
-    // But when the API and scope are in different stacks, we have a cross-stack
-    // (possibly cross-region) value reference situation. So, in this case, we
-    // need to declare a dependency on the api's stack and fetch it via a custom
-    // resource.
-
-    scopeStack.addDependency(apiStack);
-
-    // Create or reuse the remote stack outputs resource.
-    const stackOutputsId = this.uniqueSuffixedId('StackOutputs');
-    const stackOutputs =
-      (scope.node.tryFindChild(stackOutputsId) as crs.StackOutputs) ??
-      new crs.StackOutputs(scope, stackOutputsId, {
-        stack: apiStack,
-        alwaysUpdate: true,
-      });
-
-    // Access the API's domain name through the remote stack output resource
-    // once CloudFormation has created the resource.
-    return stackOutputs.getAttString(this.httpApiDomainNameOutputName);
+    return this.httpApiDomainName.getValueInScope(scope);
   }
 }
 
