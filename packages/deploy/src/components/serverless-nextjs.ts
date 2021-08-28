@@ -7,8 +7,12 @@ import * as s3_deployment from '@aws-cdk/aws-s3-deployment';
 import * as cdk from '@aws-cdk/core';
 import * as path from 'path';
 import { PACKAGES_BASE } from '../constants';
+import { ICdnBehaviorOptions } from './cdn';
 
-export class ServerlessNextjs extends cdk.Construct {
+export class ServerlessNextjs
+  extends cdk.Construct
+  implements ICdnBehaviorOptions
+{
   public readonly defaultLambda: lambda.Function;
   public readonly bucket: s3.Bucket;
 
@@ -42,7 +46,7 @@ export class ServerlessNextjs extends cdk.Construct {
     this.bucket.grantReadWrite(this.defaultLambda);
   }
 
-  public get behavior(): cloudfront.BehaviorOptions {
+  public cdnBehaviorOptions(scope: cdk.Construct): cloudfront.BehaviorOptions {
     return {
       origin: new cloudfront_origins.S3Origin(this.bucket),
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
