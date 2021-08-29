@@ -43,6 +43,7 @@ export class Cdn extends cdk.Construct {
 
     this.distribution = new cloudfront.Distribution(this, 'Distribution', {
       defaultBehavior: props.defaultBehavior.cdnBehaviorOptions(this),
+      defaultRootObject: 'index.html',
 
       // Reduce the cost
       priceClass: cloudfront.PriceClass.PRICE_CLASS_100,

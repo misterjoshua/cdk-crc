@@ -1,5 +1,6 @@
 import * as cloudfront from '@aws-cdk/aws-cloudfront';
 import * as cloudfront_origins from '@aws-cdk/aws-cloudfront-origins';
+import * as iam from '@aws-cdk/aws-iam';
 import * as s3 from '@aws-cdk/aws-s3';
 import * as s3_deployment from '@aws-cdk/aws-s3-deployment';
 import * as cdk from '@aws-cdk/core';
@@ -17,15 +18,50 @@ export class StaticSite extends cdk.Construct implements ICdnBehaviorOptions {
   public readonly bucketKeyPrefix?: string;
 
   private crossRegionBucket: CrossRegionValue<s3.IBucket, s3.BucketAttributes>;
+  private crossRegionOAI: CrossRegionValue<
+    cloudfront.IOriginAccessIdentity,
+    { originAccessIdentityName: string }
+  >;
 
   constructor(scope: cdk.Construct, id: string) {
     super(scope, id);
 
     this.bucket = new s3bng.BucketNg(this, 'StaticSite', {
-      websiteIndexDocument: 'index.html',
-      websiteErrorDocument: '404.html',
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
-    this.bucket.grantPublicAccess();
+
+    // Create an OAI in the StaticSite's stack because we don't know if the
+    // distribution that picks this up will be in this stack or cross-region.
+    // If it's cross-region, we'll have trouble updating the bucket policy
+    // at the time that we use the usual cloudfront.S3Origin in the other
+    // region. So we bypass that problem by passing the OAI name over to any
+    // other stack.
+    const oai = new cloudfront.OriginAccessIdentity(this, 'OAI');
+
+    this.bucket.addToResourcePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ['s3:GetObject'],
+        principals: [oai.grantPrincipal],
+        resources: [
+          this.bucket.bucketArn,
+          cdk.Fn.join('', [this.bucket.bucketArn, '/*']),
+        ],
+      }),
+    );
+
+    this.crossRegionOAI = new CrossRegionValue(this, 'CrossRegionOAI', {
+      value: oai,
+      props: {
+        originAccessIdentityName: oai.originAccessIdentityName,
+      },
+      produce: (scope, id, props) =>
+        cloudfront.OriginAccessIdentity.fromOriginAccessIdentityName(
+          scope,
+          id,
+          props.originAccessIdentityName,
+        ),
+    });
 
     // This will be for when we do blue/green. But that time is not now.
     this.bucketKeyPrefix = undefined;
@@ -48,9 +84,11 @@ export class StaticSite extends cdk.Construct implements ICdnBehaviorOptions {
 
   public cdnBehaviorOptions(scope: cdk.Construct): cloudfront.BehaviorOptions {
     const bucket = this.crossRegionBucket.getValueInScope(scope);
+    const originAccessIdentity = this.crossRegionOAI.getValueInScope(scope);
 
     return {
       origin: new cloudfront_origins.S3Origin(bucket, {
+        originAccessIdentity,
         originPath: this.bucketKeyPrefix,
       }),
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,

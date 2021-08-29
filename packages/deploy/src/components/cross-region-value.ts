@@ -66,6 +66,7 @@ export class CrossRegionValue<
         s3.Bucket.fromBucketAttributes(scope, id, {
           ...props,
           bucketWebsiteNewUrlFormat: true,
+          isWebsite: bucket.isWebsite,
         }),
     });
   }
@@ -73,11 +74,7 @@ export class CrossRegionValue<
   private readonly uniqueId: string;
   private readonly value: ValueType;
   private readonly props: PropsType;
-  private readonly produce: (
-    scope: cdk.Construct,
-    id: string,
-    props: PropsType,
-  ) => ValueType;
+  private readonly produce: CrossRegionValueProducer<ValueType, PropsType>;
 
   constructor(
     scope: cdk.Construct,

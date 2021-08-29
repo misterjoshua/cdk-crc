@@ -21,13 +21,10 @@ export class EdgeStack extends cdk.Stack {
       env: { region: 'us-east-1' },
     });
 
-    // Deploy the static site
-    const staticSite = new StaticSite(this, 'StaticSite');
-
     // Front the static site and api with a CDN
     this.cdn = new Cdn(this, 'Cdn', {
       domainConfig: props.domainConfig,
-      defaultBehavior: staticSite,
+      defaultBehavior: props.regionalStaticSite,
       behaviors: [{ path: '/api/*', cdnBehaviorOptions: props.regionalApi }],
     });
 
