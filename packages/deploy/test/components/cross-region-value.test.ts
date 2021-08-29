@@ -149,4 +149,28 @@ describe('cross-region-value', () => {
       1,
     );
   });
+
+  test('stack output reuse only when appropriate', () => {
+    // GIVEN
+    const app = new cdk.App();
+    const stack1 = new cdk.Stack(app, 'Stack1');
+    const stack2 = new cdk.Stack(app, 'Stack2');
+    const stack3 = new cdk.Stack(app, 'Stack3');
+    const first = CrossRegionValue.fromString(stack1, 'First', 'First Value');
+    const second = CrossRegionValue.fromString(
+      stack2,
+      'Second',
+      'Second Value',
+    );
+
+    // WHEN
+    first.getValueInScope(stack3);
+    second.getValueInScope(stack3);
+
+    // THEN
+    Template.fromStack(stack3).resourceCountIs(
+      'AWS::CloudFormation::CustomResource',
+      2,
+    );
+  });
 });
