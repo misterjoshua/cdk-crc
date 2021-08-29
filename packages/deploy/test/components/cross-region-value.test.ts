@@ -17,7 +17,7 @@ describe('cross-region-value', () => {
     );
 
     // WHEN
-    const valueInScope = ofString.getValueInScope(stack);
+    const valueInScope = ofString.getValueInScope(stack, 'Value');
 
     // THEN
     expect(valueInScope).toEqual(TEST_VALUE);
@@ -40,7 +40,7 @@ describe('cross-region-value', () => {
     });
 
     // WHEN
-    const valueInStack2 = ofString.getValueInScope(stack2);
+    const valueInStack2 = ofString.getValueInScope(stack2, 'Value');
     new cdk.CfnOutput(stack2, 'CrossRegionValue', {
       value: valueInStack2,
     });
@@ -93,7 +93,7 @@ describe('cross-region-value', () => {
 
     // WHEN
     new cdk.CfnOutput(stack2, 'BucketName', {
-      value: crossRegionBucket.getValueInScope(stack2).bucketName,
+      value: crossRegionBucket.getValueInScope(stack2, 'Bucket').bucketName,
     });
 
     // THEN
@@ -140,8 +140,8 @@ describe('cross-region-value', () => {
     );
 
     // WHEN
-    first.getValueInScope(stack2);
-    second.getValueInScope(stack2);
+    first.getValueInScope(stack2, 'First');
+    second.getValueInScope(stack2, 'Second');
 
     // THEN
     Template.fromStack(stack2).resourceCountIs(
@@ -164,8 +164,8 @@ describe('cross-region-value', () => {
     );
 
     // WHEN
-    first.getValueInScope(stack3);
-    second.getValueInScope(stack3);
+    first.getValueInScope(stack3, 'First');
+    second.getValueInScope(stack3, 'Second');
 
     // THEN
     Template.fromStack(stack3).resourceCountIs(

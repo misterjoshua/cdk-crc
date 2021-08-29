@@ -61,8 +61,11 @@ export class Cdn extends cdk.Construct {
 
   /** Add a behavior to the CDN */
   public addBehavior(behavior: AddCdnBehaviorOptions) {
+    const scope = new cdk.Construct(this, `Path${behavior.path}`);
+
     const behaviorOptions =
-      behavior.cdnBehaviorOptions.cdnBehaviorOptions(this);
+      behavior.cdnBehaviorOptions.cdnBehaviorOptions(scope);
+
     this.distribution.addBehavior(
       behavior.path,
       behaviorOptions.origin,

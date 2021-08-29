@@ -1,6 +1,6 @@
 import * as s3 from '@aws-cdk/aws-s3';
 import * as cdk from '@aws-cdk/core';
-import { StackOutputsSingleton } from './stack-outputs-singleton';
+import * as crs from 'cdk-remote-stack';
 
 /** Props for `CrossRegionValue` */
 export interface CrossRegionValueProps<ValueType, PropsType> {
@@ -99,7 +99,7 @@ export class CrossRegionValue<
   /**
    * Get the cross-regional value in the given scope.
    */
-  public getValueInScope(scope: cdk.Construct): ValueType {
+  public getValueInScope(scope: cdk.Construct, id: string): ValueType {
     const valueStack = cdk.Stack.of(this);
     const scopeStack = cdk.Stack.of(scope);
 
@@ -109,9 +109,9 @@ export class CrossRegionValue<
 
     scopeStack.addDependency(valueStack);
 
-    const stackOutputsId = this.uniqueSuffixedId('StackOutputs');
-    const { stackOutputs } = new StackOutputsSingleton(scope, stackOutputsId, {
-      stack: valueStack,
+    const stackOutputs = getStackOutputs({
+      scope,
+      remoteStack: valueStack,
     });
 
     // Reconstruct the prop values from a
@@ -121,15 +121,50 @@ export class CrossRegionValue<
       props[key] = stackOutputs.getAttString(outputName);
     }
 
-    const id = this.uniqueSuffixedId('Produce');
     return this.produce(scope, id, props as PropsType);
   }
 
   private outputName(key: string) {
-    return this.uniqueSuffixedId(`Prop${key}`);
+    return `${this.uniqueId}Prop${key}`;
   }
+}
 
-  private uniqueSuffixedId(suffix: string = ''): string {
-    return `${this.uniqueId}${suffix}`;
-  }
+/** Props for `StackOutputsSingleton` */
+export interface GetStackOutputsOptions {
+  /** Scope of the stack that wants the outputs */
+  readonly scope: cdk.Construct;
+  /** The stack with outputs we want to access. */
+  readonly remoteStack: cdk.Stack;
+}
+
+/** Get a `StackOutputs` for the given remote stack. */
+function getStackOutputs(options: GetStackOutputsOptions) {
+  const { scope, remoteStack } = options;
+
+  const scopeStack = cdk.Stack.of(scope);
+  const stackOutputsId = renderStackOutputsId(remoteStack);
+
+  const extantStackOutputs = scopeStack.node.tryFindChild(
+    stackOutputsId,
+  ) as crs.StackOutputs;
+  if (extantStackOutputs) return extantStackOutputs;
+
+  return new crs.StackOutputs(scopeStack, stackOutputsId, {
+    stack: remoteStack,
+    alwaysUpdate: true,
+  });
+}
+
+function renderStackOutputsId(givenStack: cdk.Stack) {
+  const stackName = givenStack.stackName;
+
+  const region = !isToken(givenStack.region) ? givenStack.region : 'token';
+  const account = !isToken(givenStack.account) ? givenStack.account : 'token';
+
+  return `StackOutputsR${region}A${account}S${stackName}`;
+}
+
+const TOKEN_MATCH = /^\${Token\[.*/;
+function isToken(value: string) {
+  return TOKEN_MATCH.test(value);
 }

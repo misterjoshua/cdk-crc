@@ -10,6 +10,10 @@ import { PACKAGES_BASE } from '../constants';
 import { ICdnBehaviorOptions } from './cdn';
 import { CrossRegionValue } from './cross-region-value';
 
+export interface StaticSiteProps {
+  readonly bucketKeyPrefix?: string;
+}
+
 /** Creates a bucket website and deploys the static site to it. */
 export class StaticSite extends cdk.Construct implements ICdnBehaviorOptions {
   /** The bucket with the website */
@@ -23,8 +27,10 @@ export class StaticSite extends cdk.Construct implements ICdnBehaviorOptions {
     { originAccessIdentityName: string }
   >;
 
-  constructor(scope: cdk.Construct, id: string) {
+  constructor(scope: cdk.Construct, id: string, props: StaticSiteProps = {}) {
     super(scope, id);
+
+    this.bucketKeyPrefix = props.bucketKeyPrefix;
 
     this.bucket = new s3bng.BucketNg(this, 'StaticSite', {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -63,9 +69,6 @@ export class StaticSite extends cdk.Construct implements ICdnBehaviorOptions {
         ),
     });
 
-    // This will be for when we do blue/green. But that time is not now.
-    this.bucketKeyPrefix = undefined;
-
     new s3_deployment.BucketDeployment(this, 'StaticSiteDeployment', {
       destinationBucket: this.bucket,
       destinationKeyPrefix: this.bucketKeyPrefix,
@@ -83,13 +86,15 @@ export class StaticSite extends cdk.Construct implements ICdnBehaviorOptions {
   }
 
   public cdnBehaviorOptions(scope: cdk.Construct): cloudfront.BehaviorOptions {
-    const bucket = this.crossRegionBucket.getValueInScope(scope);
-    const originAccessIdentity = this.crossRegionOAI.getValueInScope(scope);
+    const bucket = this.crossRegionBucket.getValueInScope(scope, 'Bucket');
+    const originAccessIdentity = this.crossRegionOAI.getValueInScope(
+      scope,
+      'OAI',
+    );
 
     return {
       origin: new cloudfront_origins.S3Origin(bucket, {
         originAccessIdentity,
-        originPath: this.bucketKeyPrefix,
       }),
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,

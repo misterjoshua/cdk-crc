@@ -67,18 +67,16 @@ export class Api extends cdk.Construct implements ICdnBehaviorOptions {
   }
 
   cdnBehaviorOptions(scope: cdk.Construct): cloudfront.BehaviorOptions {
-    const httpApiDomainName = this.httpApiDomainName.getValueInScope(scope);
+    const httpApiDomainName = this.httpApiDomainName.getValueInScope(
+      scope,
+      'HttpApiDomainName',
+    );
 
     return {
       origin: new cloudfront_origins.HttpOrigin(httpApiDomainName),
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
     };
-  }
-
-  /** Look up the HTTP API Domain Name */
-  public getHttpApiDomainName(scope: cdk.Construct): string {
-    return this.httpApiDomainName.getValueInScope(scope);
   }
 }
 

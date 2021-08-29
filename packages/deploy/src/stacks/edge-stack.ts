@@ -25,18 +25,18 @@ export class EdgeStack extends cdk.Stack {
     this.cdn = new Cdn(this, 'Cdn', {
       domainConfig: props.domainConfig,
       defaultBehavior: props.regionalStaticSite,
-      behaviors: [{ path: '/api/*', cdnBehaviorOptions: props.regionalApi }],
+      behaviors: [
+        {
+          path: '/api/*',
+          cdnBehaviorOptions: props.regionalApi,
+        },
+      ],
     });
 
     // Configure DNS
     const dns = new Dns(this, 'Dns', {
       cdn: this.cdn,
       domainConfig: props.domainConfig,
-    });
-
-    // API Domain Name:
-    new cdk.CfnOutput(this, 'ApiDomainName', {
-      value: props.regionalApi.getHttpApiDomainName(this),
     });
 
     // Show me things about the system.
