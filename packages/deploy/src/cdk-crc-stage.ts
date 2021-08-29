@@ -61,6 +61,7 @@ export class CdkCrcStage extends cdk.Stage {
         },
       ],
     });
+    serverlessNextJs.addBehaviors(cdn.distribution);
 
     // Configure DNS
     new Dns(edge, 'Dns', {

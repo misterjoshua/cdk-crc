@@ -1,8 +1,17 @@
+import Head from 'next/head';
+import Image from 'next/image';
+import React from 'react';
+import someImage from '../../public/tags.png';
 import { HitCounter } from '../components/hit-counter';
 
 export default function Home() {
   return (
     <>
+      <Head>
+        <title>Home Page</title>
+        <meta name="description" content="Home Page" />
+      </Head>
+
       <h1>Cloud Resume Challenge</h1>
       <p>Welcome to my Cloud Resume Challenge, prepared in CDK.</p>
 
@@ -219,6 +228,10 @@ export default function Home() {
         <HitCounter />
         &nbsp;
       </p>
+
+      <div>
+        <Image src={someImage} alt="Some image" />
+      </div>
     </>
   );
 }
