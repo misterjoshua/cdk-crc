@@ -1,6 +1,8 @@
 import * as cdk from '@aws-cdk/core';
+import { Cdn } from './components/cdn';
+import { Dns } from './components/dns';
 import { DomainConfig } from './components/domain-config';
-import { EdgeStack } from './stacks/edge-stack';
+import { ServerlessNextjs } from './components/serverless-nextjs';
 import { RegionalStatefulStack } from './stacks/regional-stateful-stack';
 import { RegionalStatelessStack } from './stacks/regional-stateless-stack';
 
@@ -41,11 +43,29 @@ export class CdkCrcStage extends cdk.Stage {
       },
     );
 
-    // Edge resources
-    new EdgeStack(this, 'Edge', {
+    // Edge/L@E resources in us-east-1
+    const edge = new cdk.Stack(this, 'Edge', {
+      env: { region: 'us-east-1' },
+    });
+
+    const serverlessNextJs = new ServerlessNextjs(edge, 'Nextjs');
+
+    // Front the static site and api with a CDN
+    const cdn = new Cdn(edge, 'Cdn', {
       domainConfig: props.domainConfig,
-      regionalApi: regionalStatelessStack.regionalApi,
-      regionalStaticSite: regionalStatelessStack.staticSite,
+      defaultBehavior: serverlessNextJs,
+      behaviors: [
+        {
+          path: '/api/*',
+          cdnBehaviorOptions: regionalStatelessStack.regionalApi,
+        },
+      ],
+    });
+
+    // Configure DNS
+    new Dns(edge, 'Dns', {
+      cdn: cdn,
+      domainConfig: props.domainConfig,
     });
   }
 }

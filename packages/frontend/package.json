@@ -3,9 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "next",
-    "build": "run-s build:out build:out-lambdas",
-    "build:out": "next build && next export",
-    "build:out-lambdas": "ts-node -P tsconfig.scripts.json src/scripts/build-lambda-at-edge.ts"
+    "build": "ts-node -P tsconfig.scripts.json src/scripts/build-lambda-at-edge.ts"
   },
   "dependencies": {
     "next": "^11.1.0",

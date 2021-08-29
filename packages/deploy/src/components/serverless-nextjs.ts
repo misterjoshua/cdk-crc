@@ -5,10 +5,12 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import * as s3 from '@aws-cdk/aws-s3';
 import * as s3_deployment from '@aws-cdk/aws-s3-deployment';
 import * as cdk from '@aws-cdk/core';
+import * as s3bng from 'cdk-s3bucket-ng';
 import * as path from 'path';
 import { PACKAGES_BASE } from '../constants';
 import { ICdnBehaviorOptions } from './cdn';
 
+/** Deploy Nextjs as lambdas */
 export class ServerlessNextjs
   extends cdk.Construct
   implements ICdnBehaviorOptions
@@ -19,7 +21,9 @@ export class ServerlessNextjs
   constructor(scope: cdk.Construct, id: string) {
     super(scope, id);
 
-    this.bucket = new s3.Bucket(this, 'Bucket');
+    this.bucket = new s3bng.BucketNg(this, 'Bucket', {
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
 
     const lambdaBase = path.join(PACKAGES_BASE, 'frontend', 'out-lambda');
 
@@ -41,6 +45,7 @@ export class ServerlessNextjs
       runtime: lambda.Runtime.NODEJS_12_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset(path.join(lambdaBase, 'default-lambda')),
+      timeout: cdk.Duration.seconds(30),
       role: lambdaAtEdgeRole,
     });
     this.bucket.grantReadWrite(this.defaultLambda);

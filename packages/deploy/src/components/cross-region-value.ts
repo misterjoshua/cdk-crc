@@ -129,35 +129,49 @@ export class CrossRegionValue<
   }
 }
 
-/** Props for `StackOutputsSingleton` */
+/** Options for `getStackOutputs` */
 export interface GetStackOutputsOptions {
-  /** Scope of the stack that wants the outputs */
-  readonly scope: cdk.Construct;
   /** The stack with outputs we want to access. */
   readonly remoteStack: cdk.Stack;
+  /** Scope of the stack that wants the outputs */
+  readonly scope: cdk.Construct;
 }
 
 /** Get a `StackOutputs` for the given remote stack. */
 function getStackOutputs(options: GetStackOutputsOptions) {
   const { scope, remoteStack } = options;
 
+  // We'll use the stack of the scope as a well-known location to store all
+  // StackOutputs.
   const scopeStack = cdk.Stack.of(scope);
+  // Render an ID that's unique based on the remote stack's identity.
   const stackOutputsId = renderStackOutputsId(remoteStack);
 
+  // Search for an extant StackOutputs in the scope and provide that first.
   const extantStackOutputs = scopeStack.node.tryFindChild(
     stackOutputsId,
   ) as crs.StackOutputs;
-  if (extantStackOutputs) return extantStackOutputs;
 
+  if (extantStackOutputs) {
+    return extantStackOutputs;
+  }
+
+  // Otherwise create the StackOutputs where it can be found and re-used.
   return new crs.StackOutputs(scopeStack, stackOutputsId, {
     stack: remoteStack,
     alwaysUpdate: true,
   });
 }
 
+/** Render a construct ID that should be unique per region & stack */
 function renderStackOutputsId(givenStack: cdk.Stack) {
   const stackName = givenStack.stackName;
 
+  // In the event that the stack doesn't have an explicit region or account,
+  // CDK will provide a token. When this happens, we'll replace the token with
+  // the string literal 'token', giving up. I wonder if it's better to throw
+  // an exception here instead, because this can lead to some undefined
+  // behavior.
   const region = !isToken(givenStack.region) ? givenStack.region : 'token';
   const account = !isToken(givenStack.account) ? givenStack.account : 'token';
 
@@ -165,6 +179,7 @@ function renderStackOutputsId(givenStack: cdk.Stack) {
 }
 
 const TOKEN_MATCH = /^\${Token\[.*/;
+/** Check if a string is a token */
 function isToken(value: string) {
   return TOKEN_MATCH.test(value);
 }

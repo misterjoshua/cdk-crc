@@ -55,6 +55,15 @@ export class Dns extends cdk.Construct {
     } else {
       this.mainDomain = cdn.distribution.distributionDomainName;
     }
+
+    // Show me things about the system.
+    new cdk.CfnOutput(this, 'HomeLink', {
+      value: cdk.Fn.join('', ['https://', this.mainDomain, '/']),
+    });
+
+    new cdk.CfnOutput(this, 'ApiLink', {
+      value: cdk.Fn.join('', ['https://', this.mainDomain, '/api/hits']),
+    });
   }
 }
 

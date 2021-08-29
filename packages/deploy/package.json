@@ -4,7 +4,7 @@
   "scripts": {
     "build": "tsc --noEmit && jest && cdk synth",
     "test": "jest",
-    "cdk": "cdk"
+    "dev": "cdk deploy \"CdkCrc-Dev/*\""
   },
   "devDependencies": {
     "@aws-cdk/assertions": "^1.120.0",
