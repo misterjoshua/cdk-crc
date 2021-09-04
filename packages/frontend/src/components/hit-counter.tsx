@@ -6,7 +6,7 @@ function useHitCounter() {
   useEffect(() => {
     async function func() {
       const host = /localhost/.test(window.location.host)
-        ? 'https://d3868n22s0idtt.cloudfront.net/api/hits'
+        ? 'https://cdk-crc-test.kellendonk.ca/api/hits'
         : '/api/hits';
 
       const res = await fetch(host);
