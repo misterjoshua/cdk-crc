@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-function useHitCounter() {
-  const [hitCounter, setHitCounter] = useState<number | undefined>();
+export function useHitCount(): number {
+  const [hitCount, setHitCount] = useState<number | undefined>();
 
   useEffect(() => {
     async function func() {
@@ -12,17 +12,17 @@ function useHitCounter() {
       const res = await fetch(host);
       const resJson = await res.json();
       const hitCount = resJson.hitCount;
-      setHitCounter(hitCount);
+      setHitCount(hitCount);
     }
 
     func();
-  }, [setHitCounter]);
+  }, [setHitCount]);
 
-  return hitCounter;
+  return hitCount;
 }
 
 export const HitCounter: React.FC = () => {
-  const hits = useHitCounter();
+  const hits = useHitCount();
 
   if (hits !== undefined) {
     return <>This site has {hits} hits</>;
