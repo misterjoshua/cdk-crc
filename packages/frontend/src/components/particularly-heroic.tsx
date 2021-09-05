@@ -155,7 +155,7 @@ export class CirclesAnimation implements IAnimatedObject {
     console.log(`${this.worldWidth} x ${this.worldHeight}`);
 
     const sizeBase = this.worldWidth + this.worldHeight;
-    for (let i = 0; i < sizeBase * 0.05; i++) {
+    for (let i = 0; i < sizeBase * 0.03; i++) {
       const sprite = new AnimationSprite(this, {
         radius: rand(1, sizeBase * 0.03),
         x: rand(0, this.worldWidth),
