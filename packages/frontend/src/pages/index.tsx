@@ -80,7 +80,7 @@ const JoshInnerProfile = () => {
         </a>
       </div>
 
-      {number && <p className="view-count">Viewed {number} times</p>}
+      <p className="view-count">{number && <>Viewed {number} times</>}&nbsp;</p>
 
       <style jsx>{`
         * {
@@ -202,7 +202,7 @@ const WorkExperience: React.FC = () => (
     </p>
 
     <section>
-      <h4>Cloud Solutions Architect / Developer</h4>
+      <h4>Cloud Solutions Architect / Principal Developer</h4>
       <em>Sole Proprietorship / Calgary / 2018 - Current</em>
       <ul>
         <li>
@@ -361,12 +361,11 @@ export default function Home() {
       <LonesomeTextSection>
         <h3>About Josh</h3>
         <p>
-          Josh is a highly motivated entrepreneur and professional developer,
-          relentless about producing great value for customers. Using advanced
+          Josh is a driven entrepreneur and professional developer, relentless
+          about producing great value for customers. Using his advanced
           knowledge and experience with cloud-native architectures, Josh builds
-          reliable, scalable, and cost-conscious solutions. Josh is driven,
-          charismatic, and will make a fantastic addition to your projects and
-          team.
+          reliable, scalable, and cost-conscious business solutions. Josh will
+          make a fantastic addition to your projects and team.
         </p>
       </LonesomeTextSection>
 
@@ -404,13 +403,16 @@ export default function Home() {
         />
       </ContentSection>
 
+      <ContentSection dark>
+        <h3 className="text-center">Josh's Experience</h3>
+      </ContentSection>
+
       <ContentSection>
         <div className="row">
-          <div className="col-md-4">
+          <div className="col-md-4 col-sm-5">
             <Skills />
           </div>
-
-          <div className="col-md-8">
+          <div className="col-md-8 col-sm-7">
             <WorkExperience />
           </div>
         </div>
@@ -419,17 +421,26 @@ export default function Home() {
   );
 }
 
-export const ContentSection: React.FC = (props) => (
-  <section>
-    <div className="container">{props.children}</div>
+export interface ContentSectionProps {
+  readonly dark?: boolean;
+}
 
-    <style jsx>{`
-      section {
-        padding-top: 3rem;
-      }
-    `}</style>
-  </section>
-);
+export const ContentSection: React.FC<ContentSectionProps> = (props) => {
+  const sectionClassName = props.dark ? 'text-white bg-black' : '';
+
+  return (
+    <section className={sectionClassName}>
+      <div className="container">{props.children}</div>
+
+      <style jsx>{`
+        section {
+          padding-top: 3rem;
+          padding-bottom: 3rem;
+        }
+      `}</style>
+    </section>
+  );
+};
 
 export interface BadgeBarProps {
   readonly badges: Array<{

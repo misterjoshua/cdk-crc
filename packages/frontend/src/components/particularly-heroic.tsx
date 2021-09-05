@@ -57,20 +57,21 @@ export const ParticularlyHeroic: React.FC = (props) => {
       <style jsx>{`
         .hero-container {
           background: black;
-          height: 66vh;
           width: 100%;
           position: relative;
         }
 
         .hero-contents {
-          position: absolute;
-          top: 0;
-          left: 0;
+          position: relative;
           width: 100%;
           height: 100%;
+          z-index: 10;
         }
 
         .backdrop {
+          position: absolute;
+          top: 0;
+          left: 0;
           opacity: 0;
         }
 
@@ -308,6 +309,7 @@ export const ParticularlyHeroicInner: React.FC = (props) => (
         width: 100%;
         margin: 2rem;
         padding: 2rem;
+        min-height: 50vh;
       }
 
       @media screen and (min-width: 600px) {
