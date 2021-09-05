@@ -36,7 +36,7 @@ export default function Home() {
             about producing great value for customers. Using his advanced
             knowledge and experience with cloud-native architectures, Josh
             builds reliable, scalable, and cost-conscious business solutions.
-            Josh will make a fantastic addition to your projects and team.
+            Josh will make an excellent addition to your projects and your team.
           </p>
         </TextBlock>
       </ContentSection>
