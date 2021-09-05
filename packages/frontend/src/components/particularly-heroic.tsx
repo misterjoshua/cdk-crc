@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { AnimationFrameLoop, IAnimatedObject } from './animation-frame-loop';
 
 export const ParticularlyHeroic: React.FC = (props) => {
   const containerRef = useRef<HTMLDivElement>();
@@ -17,48 +18,53 @@ export const ParticularlyHeroic: React.FC = (props) => {
     }
   }, [setWidth, setHeight, containerRef]);
 
-  const backdropRef = useRef<HTMLCanvasElement>();
-  const foregroundRef = useRef<HTMLCanvasElement>();
+  const backgroundCanvasRef = useRef<HTMLCanvasElement>();
+  const animationCanvasRef = useRef<HTMLCanvasElement>();
 
   useEffect(() => {
     // We need to know the width/height before we create an animation.
     if (!width || !height) return;
 
-    for (const canvas of [backdropRef.current, foregroundRef.current]) {
+    for (const canvas of [
+      backgroundCanvasRef.current,
+      animationCanvasRef.current,
+    ]) {
       canvas.width = width;
       canvas.height = height;
     }
 
-    drawBackdrop({
-      canvas: backdropRef.current,
+    // Draw this once and give it to the animation frame loop.
+    drawBackgroundCanvas({
+      canvas: backgroundCanvasRef.current,
       width,
       height,
+      baseHue: 250,
     });
 
-    const animator = new CanvasAnimator({
+    const animationFrameLoop = new AnimationFrameLoop({
       animatedObject: new CirclesAnimation({
-        backgroundImage: backdropRef.current,
-        canvas: foregroundRef.current,
-        width,
-        height,
+        backgroundImage: backgroundCanvasRef.current,
+        canvas: animationCanvasRef.current,
+        worldWidth: width,
+        worldHeight: height,
       }),
     });
 
-    return () => animator.stop();
-  }, [width, height, backdropRef, foregroundRef]);
+    return () => animationFrameLoop.stop();
+  }, [width, height, backgroundCanvasRef, animationCanvasRef]);
 
   return (
     <section ref={containerRef} className="hero-container">
-      <canvas ref={backdropRef} className="backdrop" />
-      <canvas ref={foregroundRef} className="foreground" />
+      <canvas ref={backgroundCanvasRef} className="background-canvas" />
+      <canvas ref={animationCanvasRef} className="animation-canvas" />
 
       <div className="hero-contents">{props.children}</div>
 
       <style jsx>{`
         .hero-container {
+          position: relative;
           background: black;
           width: 100%;
-          position: relative;
         }
 
         .hero-contents {
@@ -66,16 +72,18 @@ export const ParticularlyHeroic: React.FC = (props) => {
           width: 100%;
           height: 100%;
           z-index: 10;
+          display: flex;
+          justify-content: center;
         }
 
-        .backdrop {
+        .background-canvas {
           position: absolute;
           top: 0;
           left: 0;
           opacity: 0;
         }
 
-        .foreground {
+        .animation-canvas {
           position: absolute;
           top: 0;
           left: 0;
@@ -86,78 +94,45 @@ export const ParticularlyHeroic: React.FC = (props) => {
   );
 };
 
-export interface IAnimatedObject {
-  update(timeElapsed: number);
-}
-
 export interface IDrawableObject extends IAnimatedObject {
   draw(context: CanvasRenderingContext2D);
 }
 
-export interface CanvasAnimatorOptions {
-  readonly animatedObject: IAnimatedObject;
-}
-
-export class CanvasAnimator {
-  private readonly animatedObject: IAnimatedObject;
-
-  private running = true;
-  private lastTime?: number;
-
-  constructor(options: CanvasAnimatorOptions) {
-    this.animatedObject = options.animatedObject;
-    this.requestNextAnimationFrame();
-  }
-
-  requestNextAnimationFrame() {
-    requestAnimationFrame((timestamp) => this.loop(timestamp));
-  }
-
-  stop() {
-    this.running = false;
-  }
-
-  loop(time: number) {
-    // Loop until we've been asked to stop
-    if (!this.running) return;
-
-    const deltaTime = time - (this.lastTime ?? time);
-    this.lastTime = time;
-
-    this.animatedObject.update(deltaTime);
-
-    this.requestNextAnimationFrame();
-  }
-}
-
 export interface CirclesAnimationOptions {
+  /** Background image for the animation */
   readonly backgroundImage: HTMLCanvasElement;
+  /** Canvas for drawing the animation */
   readonly canvas: HTMLCanvasElement;
-  readonly width: number;
-  readonly height: number;
+  /** Width of the canvas / world */
+  readonly worldWidth: number;
+  /** Height of the canvas / world */
+  readonly worldHeight: number;
 }
 
+/** Animate some nice-looking circles by tracking particles */
 export class CirclesAnimation implements IAnimatedObject {
+  /** Image drawn behind */
   private readonly backgroundImage: HTMLCanvasElement;
+  /** Rendering context for the animated canvas */
   private readonly context: CanvasRenderingContext2D;
 
   public readonly worldWidth: number;
   public readonly worldHeight: number;
 
-  private readonly sprites: AnimationSprite[] = [];
+  private readonly sprites: CircleSprite[] = [];
 
   constructor(options: CirclesAnimationOptions) {
     this.backgroundImage = options.backgroundImage;
     this.context = options.canvas.getContext('2d');
 
-    this.worldWidth = options.width;
-    this.worldHeight = options.height;
+    this.worldWidth = options.worldWidth;
+    this.worldHeight = options.worldHeight;
 
-    console.log(`${this.worldWidth} x ${this.worldHeight}`);
+    console.log(`Animating ${this.worldWidth} x ${this.worldHeight}`);
 
     const sizeBase = this.worldWidth + this.worldHeight;
     for (let i = 0; i < sizeBase * 0.03; i++) {
-      const sprite = new AnimationSprite(this, {
+      const sprite = new CircleSprite(this, {
         radius: rand(1, sizeBase * 0.03),
         x: rand(0, this.worldWidth),
         y: rand(0, this.worldHeight),
@@ -187,7 +162,7 @@ export class CirclesAnimation implements IAnimatedObject {
   }
 }
 
-export interface AnimationSpriteState {
+export interface CircleSpriteState {
   radius: number;
   x: number;
   y: number;
@@ -196,10 +171,10 @@ export interface AnimationSpriteState {
   tick: number;
 }
 
-class AnimationSprite implements IDrawableObject {
+class CircleSprite implements IDrawableObject {
   constructor(
     private readonly world: CirclesAnimation,
-    private readonly state: AnimationSpriteState,
+    private readonly state: CircleSpriteState,
   ) {}
 
   update(deltaTime: number) {
@@ -208,13 +183,20 @@ class AnimationSprite implements IDrawableObject {
     // Movement at an angle at a velocity
     state.x += Math.cos(state.angle) * state.speed * deltaTime;
     state.y += Math.sin(state.angle) * state.speed * deltaTime;
+    // Allow the circles to drift out-of-angle randomly
     state.angle += rand(-0.05, 0.05);
 
-    // Teleport to the other side when exiting the scene
+    // Teleport to the other side when out of bounds.
+
+    // Out of bounds right
     if (state.x - state.radius > this.world.worldWidth) state.x = -state.radius;
+    // Out of bounds left
     if (state.x + state.radius < 0)
       state.x = this.world.worldWidth + state.radius;
-    if (state.y - state.radius > this.world.worldWidth) state.y = -state.radius;
+    // Out of bounds bottom
+    if (state.y - state.radius > this.world.worldHeight)
+      state.y = -state.radius;
+    // Out of bounds top
     if (state.y + state.radius < 0)
       state.y = this.world.worldHeight + state.radius;
 
@@ -233,27 +215,26 @@ class AnimationSprite implements IDrawableObject {
   }
 }
 
-interface DrawBackdropParams {
+interface DrawBackgroundCanvasOptions {
   readonly canvas: HTMLCanvasElement;
   readonly width: number;
   readonly height: number;
-  readonly baseHue?: number;
+  readonly baseHue: number;
 }
 
-function drawBackdrop(options: DrawBackdropParams) {
+function drawBackgroundCanvas(options: DrawBackgroundCanvasOptions) {
   const ctx = options.canvas.getContext('2d');
 
   const sizeBase = options.width + options.height;
   const count = Math.floor(sizeBase * 0.3);
-  const baseHue = options.baseHue ?? 250;
 
   const opt = {
     radiusMin: 1,
     radiusMax: sizeBase * 0.04,
     blurMin: 10,
     blurMax: sizeBase * 0.04,
-    hueMin: baseHue,
-    hueMax: baseHue + 100,
+    hueMin: options.baseHue,
+    hueMax: options.baseHue + 100,
     saturationMin: 10,
     saturationMax: 70,
     lightnessMin: 20,
@@ -289,31 +270,35 @@ function rand(min: number, max: number) {
 }
 
 function hsla(h: number, s: number, l: number, a: number): string {
-  return 'hsla(' + h + ',' + s + '%,' + l + '%,' + a + ')';
+  return `hsla(${h},${s}%,${l}%,${a})`;
 }
 
 const FULL_CIRCLE = Math.PI * 2;
-export const ParticularlyHeroicInner: React.FC = (props) => (
-  <div className="nice-box">
-    {props.children}
+
+export const NiceTranslucentBox: React.FC = (props) => (
+  <div className="nice-translucent-box">
+    <div className="nice-translucent-box-inner">{props.children}</div>
 
     <style jsx>{`
-      .nice-box {
+      .nice-translucent-box {
         display: flex;
-        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        padding: 2rem;
+      }
+      .nice-translucent-box-inner {
+        display: flex;
         align-items: center;
         justify-content: center;
-
         background: rgba(0, 0, 0, 0.7);
         color: white;
         width: 100%;
-        margin: 2rem;
         padding: 2rem;
         min-height: 50vh;
       }
 
       @media screen and (min-width: 600px) {
-        .nice-box {
+        .nice-translucent-box {
           max-width: 600px;
         }
       }

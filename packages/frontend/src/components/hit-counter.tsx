@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function useHitCount(): number {
   const [hitCount, setHitCount] = useState<number | undefined>();
@@ -20,13 +20,3 @@ export function useHitCount(): number {
 
   return hitCount;
 }
-
-export const HitCounter: React.FC = () => {
-  const hits = useHitCount();
-
-  if (hits !== undefined) {
-    return <>This site has {hits} hits</>;
-  } else {
-    return <></>;
-  }
-};

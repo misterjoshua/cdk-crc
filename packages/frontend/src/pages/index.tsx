@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import awsCsaaBadge from '../../public/badges/aws-certified-solutions-architect-associate.png';
 import psdBadge from '../../public/badges/professional-scrum-developer-i-psd-i.png';
 import psmBadge from '../../public/badges/professional-scrum-master-i-psm-i.png';
@@ -9,41 +9,22 @@ import profilePicture from '../../public/profile-picture.jpg';
 import { useHitCount } from '../components/hit-counter';
 import { PageLayout } from '../components/page-layout';
 import {
+  NiceTranslucentBox,
   ParticularlyHeroic,
-  ParticularlyHeroicInner,
 } from '../components/particularly-heroic';
+import { TextBlock } from '../components/text-block';
+import { useScreenSize } from '../components/use-screen-size';
+import { ContentSection } from './content-section';
 
-function useDimensions() {
-  const [width, setWidth] = useState<number>();
-  const [height, setHeight] = useState<number>();
-
-  useEffect(() => {
-    resize();
-
-    window.addEventListener('resize', resize);
-    return () => window.removeEventListener('resize', resize);
-
-    function resize() {
-      setWidth(window.visualViewport.width);
-      setHeight(window.visualViewport.height);
-    }
-  }, [setWidth, setHeight]);
-
-  return {
-    width,
-    height,
-  };
-}
-
-const JoshInnerProfile = () => {
+const JoshProfile = () => {
   const number = useHitCount();
-  const dims = useDimensions();
+  const dims = useScreenSize();
 
   // On big screens, we want this bigger.
   const imageSize = dims.width > 600 ? 150 : 100;
 
   return (
-    <ParticularlyHeroicInner>
+    <div className="josh-profile text-center">
       <div style={{ height: imageSize }}>
         <Image
           src={profilePicture}
@@ -53,8 +34,8 @@ const JoshInnerProfile = () => {
         />
       </div>
 
-      <h1>Josh Kellendonk</h1>
-      <h2>Full-Stack, Cloud-Native Developer</h2>
+      <h1 className="josh-profile-name">Josh Kellendonk</h1>
+      <h2 className="josh-profile-title">Full-Stack, Cloud-Native Developer</h2>
 
       <div className="josh-profile-link-banner">
         <a
@@ -80,37 +61,36 @@ const JoshInnerProfile = () => {
         </a>
       </div>
 
-      <p className="view-count">{number && <>Viewed {number} times</>}&nbsp;</p>
+      <p className="josh-profile-view-count">
+        {number && <>Viewed {number} times</>}&nbsp;
+      </p>
 
-      <style jsx>{`
-        * {
-          text-align: center;
+      <style jsx global>{`
+        .josh-inner-profile-img {
+          border-radius: 100px;
         }
-
-        h1 {
+      `}</style>
+      <style jsx>{`
+        .josh-profile-name {
           margin-top: 0.5em;
           font-size: 1.4rem;
         }
 
-        h2 {
+        .josh-profile-title {
           font-size: 1rem;
         }
 
         @media screen and (min-width: 400px) {
-          h1 {
+          .josh-profile-name {
             font-size: 1.8rem;
           }
 
-          h2 {
+          .josh-profile-title {
             font-size: 1.5rem;
           }
         }
 
-        h2 span {
-          white-space: nowrap;
-        }
-
-        .view-count {
+        .josh-profile-view-count {
           margin-top: 1rem;
         }
 
@@ -118,6 +98,7 @@ const JoshInnerProfile = () => {
           display: flex;
           font-size: 2rem;
           margin-top: 1rem;
+          justify-content: center;
         }
 
         .josh-profile-link-banner a {
@@ -125,36 +106,15 @@ const JoshInnerProfile = () => {
           margin: 0 0.5rem;
         }
       `}</style>
-
-      <style jsx global>{`
-        .josh-inner-profile-img {
-          border-radius: 100px;
-        }
-      `}</style>
-    </ParticularlyHeroicInner>
+    </div>
   );
 };
-
-const JoshProfile = () => (
-  <div className="nice-layout">
-    <JoshInnerProfile />
-
-    <style jsx>{`
-      .nice-layout {
-        height: 100%;
-        display: flex;
-        justify-content: center;
-      }
-    `}</style>
-  </div>
-);
 
 const Skills: React.FC = () => (
   <>
     <h3>Tools and Techniques</h3>
-    <p>Here are my experience levels with some key tools and techniques:</p>
 
-    <h4>Solid Experience</h4>
+    <h4>🔥 Solid Experience</h4>
     <ul>
       <li>CloudFormation (YAML), AWS CDK</li>
       <li>EC2, Autoscaling, ELB/ALB, & ECS</li>
@@ -169,7 +129,7 @@ const Skills: React.FC = () => (
       <li>Visual communication tools</li>
     </ul>
 
-    <h4>Good Experience</h4>
+    <h4>🚀 Good Experience</h4>
     <ul>
       <li>C#/.NET4 (WPF & WinRT)</li>
       <li>Golang</li>
@@ -177,7 +137,7 @@ const Skills: React.FC = () => (
       <li>Microsoft Dynamics CRM</li>
     </ul>
 
-    <h4>Some Experience</h4>
+    <h4>✔ Some Experience</h4>
     <ul>
       <li>Puppet & Terraform HCL</li>
       <li>Ruby scripting</li>
@@ -185,7 +145,7 @@ const Skills: React.FC = () => (
       <li>Always learning more</li>
     </ul>
 
-    <h4>Learn-on-demand</h4>
+    <h4>🏫 Learn-on-demand</h4>
     <p>
       Josh is a quick study, so this list of skills changes quickly. If your
       project or team role needs a skill-set not shown here, please give me a
@@ -194,12 +154,9 @@ const Skills: React.FC = () => (
   </>
 );
 
-const WorkExperience: React.FC = () => (
+const WorkHistory: React.FC = () => (
   <>
-    <h3>Work Experience</h3>
-    <p>
-      Josh has had extensive experience in marketing and advertising technology.
-    </p>
+    <h3>Work History</h3>
 
     <section>
       <h4>Cloud Solutions Architect / Principal Developer</h4>
@@ -334,18 +291,6 @@ const WorkExperience: React.FC = () => (
   </>
 );
 
-const LonesomeTextSection: React.FC = (props) => (
-  <ContentSection>
-    <div className="lonesome-text">{props.children}</div>
-    <style jsx>{`
-      .lonesome-text {
-        max-width: 800px;
-        margin: 0 auto;
-      }
-    `}</style>
-  </ContentSection>
-);
-
 export default function Home() {
   return (
     <PageLayout>
@@ -355,27 +300,26 @@ export default function Home() {
       </Head>
 
       <ParticularlyHeroic>
-        <JoshProfile />
+        <NiceTranslucentBox>
+          <JoshProfile />
+        </NiceTranslucentBox>
       </ParticularlyHeroic>
 
-      <LonesomeTextSection>
-        <h3>About Josh</h3>
-        <p>
-          Josh is a driven entrepreneur and professional developer, relentless
-          about producing great value for customers. Using his advanced
-          knowledge and experience with cloud-native architectures, Josh builds
-          reliable, scalable, and cost-conscious business solutions. Josh will
-          make a fantastic addition to your projects and team.
-        </p>
-      </LonesomeTextSection>
+      <ContentSection>
+        <TextBlock>
+          <h3 className="text-center">About Josh</h3>
+          <p>
+            Josh is a driven entrepreneur and professional developer, relentless
+            about producing great value for customers. Using his advanced
+            knowledge and experience with cloud-native architectures, Josh
+            builds reliable, scalable, and cost-conscious business solutions.
+            Josh will make a fantastic addition to your projects and team.
+          </p>
+        </TextBlock>
+      </ContentSection>
 
       <ContentSection>
-        <h3 className="title">Certifications</h3>
-        <style jsx>{`
-          h3 {
-            text-align: center;
-          }
-        `}</style>
+        <h3 className="text-center">Certifications</h3>
 
         <BadgeBar
           badges={[
@@ -409,38 +353,17 @@ export default function Home() {
 
       <ContentSection>
         <div className="row">
-          <div className="col-md-4 col-sm-5">
+          <div className="col-lg-4">
             <Skills />
           </div>
-          <div className="col-md-8 col-sm-7">
-            <WorkExperience />
+          <div className="col-lg-8 col-sm-">
+            <WorkHistory />
           </div>
         </div>
       </ContentSection>
     </PageLayout>
   );
 }
-
-export interface ContentSectionProps {
-  readonly dark?: boolean;
-}
-
-export const ContentSection: React.FC<ContentSectionProps> = (props) => {
-  const sectionClassName = props.dark ? 'text-white bg-black' : '';
-
-  return (
-    <section className={sectionClassName}>
-      <div className="container">{props.children}</div>
-
-      <style jsx>{`
-        section {
-          padding-top: 3rem;
-          padding-bottom: 3rem;
-        }
-      `}</style>
-    </section>
-  );
-};
 
 export interface BadgeBarProps {
   readonly badges: Array<{
