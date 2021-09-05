@@ -1,6 +1,7 @@
 import parse from 'html-react-parser';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
+import { ContentSection } from '../../../components/content-section';
 import { PageLayout } from '../../../components/page-layout';
 import {
   NiceTranslucentBox,
@@ -8,7 +9,6 @@ import {
 } from '../../../components/particularly-heroic';
 import { TextBlock } from '../../../components/text-block';
 import { BlogData, BlogPost } from '../../../util/blog';
-import { ContentSection } from '../../content-section';
 
 export interface BlogPostPageIndex {
   readonly post: BlogPost;

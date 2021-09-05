@@ -5,6 +5,7 @@ import awsCsaaBadge from '../../public/badges/aws-certified-solutions-architect-
 import psdBadge from '../../public/badges/professional-scrum-developer-i-psd-i.png';
 import psmBadge from '../../public/badges/professional-scrum-master-i-psm-i.png';
 import pspoBadge from '../../public/badges/professional-scrum-product-owner-i-pspo-i.png';
+import { ContentSection } from '../components/content-section';
 import { JoshProfile } from '../components/josh-profile';
 import { PageLayout } from '../components/page-layout';
 import {
@@ -12,7 +13,6 @@ import {
   ParticularlyHeroic,
 } from '../components/particularly-heroic';
 import { TextBlock } from '../components/text-block';
-import { ContentSection } from './content-section';
 
 const Skills: React.FC = () => (
   <>

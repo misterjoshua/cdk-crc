@@ -2,6 +2,7 @@ import parse from 'html-react-parser';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
+import { ContentSection } from '../../components/content-section';
 import { PageLayout } from '../../components/page-layout';
 import {
   NiceTranslucentBox,
@@ -10,7 +11,6 @@ import {
 import { PostInfoDisplay } from '../../components/post-info-display';
 import { TextBlock } from '../../components/text-block';
 import { BlogData, BlogPost, getBlogHref } from '../../util/blog';
-import { ContentSection } from '../content-section';
 
 export interface BlogIndexProps {
   readonly items: BlogPost[];
