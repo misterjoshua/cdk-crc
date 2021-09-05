@@ -286,15 +286,16 @@ export const NiceTranslucentBox: React.FC = (props) => (
         width: 100%;
         padding: 2rem;
       }
+
       .nice-translucent-box-inner {
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         background: rgba(0, 0, 0, 0.7);
         color: white;
         width: 100%;
         padding: 2rem;
-        min-height: 50vh;
       }
 
       @media screen and (min-width: 600px) {

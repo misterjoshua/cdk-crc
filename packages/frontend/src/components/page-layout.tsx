@@ -9,9 +9,11 @@ function MainNav() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-black">
       <div className="container">
-        <a href="#" className="navbar-brand">
-          Josh Kellendonk
-        </a>
+        <Link passHref href="/">
+          <a href="" className="navbar-brand">
+            Josh Kellendonk
+          </a>
+        </Link>
 
         <button
           className="navbar-toggler"
