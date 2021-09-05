@@ -188,8 +188,8 @@ const Skills: React.FC = () => (
     <h4>Learn-on-demand</h4>
     <p>
       Josh is a quick study, so this list of skills changes quickly. If your
-      project or team role wants any certain skills not shown here, please give
-      me a call and we can discuss your needs.
+      project or team role needs a skill-set not shown here, please give me a
+      call and we can discuss your needs.
     </p>
   </>
 );
@@ -334,6 +334,18 @@ const WorkExperience: React.FC = () => (
   </>
 );
 
+const LonesomeTextSection: React.FC = (props) => (
+  <ContentSection>
+    <div className="lonesome-text">{props.children}</div>
+    <style jsx>{`
+      .lonesome-text {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+    `}</style>
+  </ContentSection>
+);
+
 export default function Home() {
   return (
     <PageLayout>
@@ -346,91 +358,50 @@ export default function Home() {
         <JoshProfile />
       </ParticularlyHeroic>
 
-      <ContentSection>
-        <div className="lonesome-text">
-          <h3>About Josh</h3>
-          <p>
-            Josh is a highly motivated entrepreneur and professional developer,
-            relentless about producing great value for customers. Using advanced
-            knowledge and experience with cloud-native architectures, Josh
-            builds reliable, scalable, and cost-conscious solutions. Josh is
-            driven, charismatic, and will make a fantastic addition to your
-            projects and team.
-          </p>
-        </div>
-        <style jsx>{`
-          .lonesome-text {
-            max-width: 800px;
-            margin: 0 auto;
-          }
-        `}</style>
-      </ContentSection>
+      <LonesomeTextSection>
+        <h3>About Josh</h3>
+        <p>
+          Josh is a highly motivated entrepreneur and professional developer,
+          relentless about producing great value for customers. Using advanced
+          knowledge and experience with cloud-native architectures, Josh builds
+          reliable, scalable, and cost-conscious solutions. Josh is driven,
+          charismatic, and will make a fantastic addition to your projects and
+          team.
+        </p>
+      </LonesomeTextSection>
 
       <ContentSection>
         <h3 className="title">Certifications</h3>
-
-        <div className="badges">
-          <a
-            target="_blank"
-            href="https://www.credly.com/badges/14c0566c-4c34-41d0-95c2-196c0e4aac6d/public_url"
-          >
-            <Image
-              src={awsCsaaBadge}
-              width={125}
-              height={125}
-              alt="Amazon Certificate Solutions Architect - Associate"
-            />
-          </a>
-
-          <a
-            target="_blank"
-            href="https://www.credly.com/badges/b7e9fb45-9e41-4135-89d5-c8edeacdc681/public_url"
-          >
-            <Image
-              src={psmBadge}
-              width={125}
-              height={125}
-              alt="Professional Scrum Master"
-            />
-          </a>
-
-          <a
-            target="_blank"
-            href="https://www.credly.com/badges/7e58e8c7-5f66-46c3-956b-cdaf5c0bbe2e/public_url"
-          >
-            <Image
-              src={pspoBadge}
-              width={125}
-              height={125}
-              alt="Professional Scrum Product Owner"
-            />
-          </a>
-
-          <a
-            target="_blank"
-            href="https://www.credly.com/badges/52cd2d7c-d6df-435d-82ba-1ef7aa6144b1/public_url"
-          >
-            <Image
-              src={psdBadge}
-              width={125}
-              height={125}
-              alt="Professional Scrum Developer"
-            />
-          </a>
-        </div>
-
         <style jsx>{`
-          .badges {
-            margin-top: 2rem;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-evenly;
-          }
-
-          .title {
+          h3 {
             text-align: center;
           }
         `}</style>
+
+        <BadgeBar
+          badges={[
+            {
+              href: 'https://www.credly.com/badges/14c0566c-4c34-41d0-95c2-196c0e4aac6d/public_url',
+              name: 'Amazon Certificate Solutions Architect - Associate',
+              image: awsCsaaBadge,
+            },
+            {
+              href: 'https://www.credly.com/badges/b7e9fb45-9e41-4135-89d5-c8edeacdc681/public_url',
+              name: 'Professional Scrum Master',
+              image: psmBadge,
+            },
+            {
+              href: 'https://www.credly.com/badges/7e58e8c7-5f66-46c3-956b-cdaf5c0bbe2e/public_url',
+              name: 'Professional Scrum Product Owner',
+              image: pspoBadge,
+            },
+            {
+              href: 'https://www.credly.com/badges/52cd2d7c-d6df-435d-82ba-1ef7aa6144b1/public_url',
+              name: 'Professional Scrum Developer',
+              image: psdBadge,
+            },
+          ]}
+        />
       </ContentSection>
 
       <ContentSection>
@@ -458,4 +429,37 @@ export const ContentSection: React.FC = (props) => (
       }
     `}</style>
   </section>
+);
+
+export interface BadgeBarProps {
+  readonly badges: Array<{
+    readonly href: string;
+    readonly name: string;
+    readonly image: StaticImageData;
+  }>;
+}
+
+export const BadgeBar: React.FC<BadgeBarProps> = (props) => (
+  <>
+    <div className="badges">
+      {props.badges.map((badge, i) => (
+        <a key={i} target="_blank" href={badge.href}>
+          <Image src={badge.image} width={125} height={125} alt={badge.name} />
+        </a>
+      ))}
+    </div>
+
+    <style jsx>{`
+      .badges {
+        margin-top: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+      }
+
+      .title {
+        text-align: center;
+      }
+    `}</style>
+  </>
 );
