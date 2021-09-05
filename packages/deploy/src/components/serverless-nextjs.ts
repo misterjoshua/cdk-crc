@@ -96,7 +96,7 @@ export class ServerlessNextjs
     };
   }
 
-  private createAssetsBehaviorOptions() {
+  private createAssetsBehaviorOptions(): cloudfront.AddBehaviorOptions {
     new s3_deployment.BucketDeployment(this, 'AssetsDeployment', {
       destinationBucket: this.bucket,
       sources: [
@@ -124,7 +124,9 @@ export class ServerlessNextjs
     };
   }
 
-  private createImageBehaviorOptions() {
+  private createImageBehaviorOptions():
+    | cloudfront.AddBehaviorOptions
+    | undefined {
     const imageLambdaPath = path.join(this.lambdaBaseDir, 'image-lambda');
 
     if (!fs.existsSync(imageLambdaPath)) {
@@ -147,11 +149,22 @@ export class ServerlessNextjs
       },
     );
 
+    const cachePolicy = new cloudfront.CachePolicy(this, 'ImageCachePolicy', {
+      queryStringBehavior: cloudfront.CacheQueryStringBehavior.all(),
+      headerBehavior: cloudfront.CacheHeaderBehavior.allowList('Accept'),
+      cookieBehavior: cloudfront.CacheCookieBehavior.none(),
+      defaultTtl: cdk.Duration.days(1),
+      maxTtl: cdk.Duration.days(365),
+      minTtl: cdk.Duration.days(0),
+      enableAcceptEncodingBrotli: true,
+      enableAcceptEncodingGzip: true,
+    });
+
     return {
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
       cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
-      cachePolicy: this.assetCachePolicy,
+      cachePolicy,
       compress: true,
       originRequestPolicy: imageOriginRequestPolicy,
       edgeLambdas: [
