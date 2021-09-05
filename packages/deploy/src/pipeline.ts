@@ -1,3 +1,4 @@
+import { StringParameter } from '@aws-cdk/aws-ssm';
 import * as cdk from '@aws-cdk/core';
 import {
   CodePipeline,
@@ -10,7 +11,7 @@ import {
   DOMAIN_CERT_PARAM,
   DOMAIN_NAME,
   DOMAIN_ZONE_ID_PARAM,
-  PIPELINE_CONNECTION_ID,
+  PIPELINE_CONNECTION_ARN_PARAM,
   PIPELINE_REPO,
   PIPELINE_REPO_BRANCH,
 } from './constants';
@@ -22,7 +23,12 @@ export class Pipeline extends cdk.Stack {
   constructor(app: cdk.Construct, id: string, props: cdk.StackProps = {}) {
     super(app, id, props);
 
-    const connectionArn = `arn:aws:codestar-connections:${this.region}:${this.account}:connection/${PIPELINE_CONNECTION_ID}`;
+    // Fetch the Pipeline Connection ARN from SSM
+    const pipelineConnectionArnParam = StringParameter.fromStringParameterName(
+      this,
+      'PipelineConnectionArnParameter',
+      PIPELINE_CONNECTION_ARN_PARAM,
+    );
 
     const pipeline = new CodePipeline(this, 'Pipeline', {
       synth: new ShellStep('Synth', {
@@ -30,7 +36,7 @@ export class Pipeline extends cdk.Stack {
           PIPELINE_REPO,
           PIPELINE_REPO_BRANCH,
           {
-            connectionArn,
+            connectionArn: pipelineConnectionArnParam.stringValue,
           },
         ),
         installCommands: ['bash pipeline-setup.sh'],
