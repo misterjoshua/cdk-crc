@@ -1,27 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { AnimationFrameLoop, IAnimatedObject } from './animation-frame-loop';
+import { useElementSize } from './use-element-size';
 
 export const ParticularlyHeroic: React.FC = (props) => {
   const containerRef = useRef<HTMLDivElement>();
-  const [width, setWidth] = useState<number>();
-  const [height, setHeight] = useState<number>();
-
-  useEffect(() => {
-    setDimensions();
-
-    window.addEventListener('resize', setDimensions);
-    return () => window.removeEventListener('resize', setDimensions);
-
-    function setDimensions() {
-      setWidth(containerRef.current.clientWidth);
-      setHeight(containerRef.current.clientHeight);
-    }
-  }, [setWidth, setHeight, containerRef]);
-
   const backgroundCanvasRef = useRef<HTMLCanvasElement>();
   const animationCanvasRef = useRef<HTMLCanvasElement>();
+  const containerDimensions = useElementSize(containerRef);
 
   useEffect(() => {
+    const { width, height } = containerDimensions;
+
     // We need to know the width/height before we create an animation.
     if (!width || !height) return;
 
@@ -51,7 +40,7 @@ export const ParticularlyHeroic: React.FC = (props) => {
     });
 
     return () => animationFrameLoop.stop();
-  }, [width, height, backgroundCanvasRef, animationCanvasRef]);
+  }, [containerDimensions, backgroundCanvasRef, animationCanvasRef]);
 
   return (
     <section ref={containerRef} className="hero-container">

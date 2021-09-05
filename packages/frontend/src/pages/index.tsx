@@ -14,6 +14,80 @@ import {
 } from '../components/particularly-heroic';
 import { TextBlock } from '../components/text-block';
 
+export default function Home() {
+  return (
+    <PageLayout>
+      <Head>
+        <title>Josh Kellendonk</title>
+        <meta name="description" content="Josh Kellendonk's website." />
+      </Head>
+
+      <ParticularlyHeroic>
+        <NiceTranslucentBox>
+          <JoshProfile />
+        </NiceTranslucentBox>
+      </ParticularlyHeroic>
+
+      <ContentSection>
+        <TextBlock>
+          <h3 className="text-center">About Josh</h3>
+          <p>
+            Josh is a driven entrepreneur and professional developer, relentless
+            about producing great value for customers. Using his advanced
+            knowledge and experience with cloud-native architectures, Josh
+            builds reliable, scalable, and cost-conscious business solutions.
+            Josh will make a fantastic addition to your projects and team.
+          </p>
+        </TextBlock>
+      </ContentSection>
+
+      <ContentSection>
+        <h3 className="text-center">Certifications</h3>
+
+        <BadgeBar
+          badges={[
+            {
+              href: 'https://www.credly.com/badges/14c0566c-4c34-41d0-95c2-196c0e4aac6d/public_url',
+              name: 'Amazon Certificate Solutions Architect - Associate',
+              image: awsCsaaBadge,
+            },
+            {
+              href: 'https://www.credly.com/badges/b7e9fb45-9e41-4135-89d5-c8edeacdc681/public_url',
+              name: 'Professional Scrum Master',
+              image: psmBadge,
+            },
+            {
+              href: 'https://www.credly.com/badges/7e58e8c7-5f66-46c3-956b-cdaf5c0bbe2e/public_url',
+              name: 'Professional Scrum Product Owner',
+              image: pspoBadge,
+            },
+            {
+              href: 'https://www.credly.com/badges/52cd2d7c-d6df-435d-82ba-1ef7aa6144b1/public_url',
+              name: 'Professional Scrum Developer',
+              image: psdBadge,
+            },
+          ]}
+        />
+      </ContentSection>
+
+      <ContentSection dark>
+        <h3 className="text-center">Josh's Experience</h3>
+      </ContentSection>
+
+      <ContentSection>
+        <div className="row">
+          <div className="col-lg-4">
+            <Skills />
+          </div>
+          <div className="col-lg-8 col-sm-">
+            <WorkHistory />
+          </div>
+        </div>
+      </ContentSection>
+    </PageLayout>
+  );
+}
+
 const Skills: React.FC = () => (
   <>
     <h3>Tools and Techniques</h3>
@@ -194,80 +268,6 @@ const WorkHistory: React.FC = () => (
     </section>
   </>
 );
-
-export default function Home() {
-  return (
-    <PageLayout>
-      <Head>
-        <title>Home Page</title>
-        <meta name="description" content="Home Page" />
-      </Head>
-
-      <ParticularlyHeroic>
-        <NiceTranslucentBox>
-          <JoshProfile />
-        </NiceTranslucentBox>
-      </ParticularlyHeroic>
-
-      <ContentSection>
-        <TextBlock>
-          <h3 className="text-center">About Josh</h3>
-          <p>
-            Josh is a driven entrepreneur and professional developer, relentless
-            about producing great value for customers. Using his advanced
-            knowledge and experience with cloud-native architectures, Josh
-            builds reliable, scalable, and cost-conscious business solutions.
-            Josh will make a fantastic addition to your projects and team.
-          </p>
-        </TextBlock>
-      </ContentSection>
-
-      <ContentSection>
-        <h3 className="text-center">Certifications</h3>
-
-        <BadgeBar
-          badges={[
-            {
-              href: 'https://www.credly.com/badges/14c0566c-4c34-41d0-95c2-196c0e4aac6d/public_url',
-              name: 'Amazon Certificate Solutions Architect - Associate',
-              image: awsCsaaBadge,
-            },
-            {
-              href: 'https://www.credly.com/badges/b7e9fb45-9e41-4135-89d5-c8edeacdc681/public_url',
-              name: 'Professional Scrum Master',
-              image: psmBadge,
-            },
-            {
-              href: 'https://www.credly.com/badges/7e58e8c7-5f66-46c3-956b-cdaf5c0bbe2e/public_url',
-              name: 'Professional Scrum Product Owner',
-              image: pspoBadge,
-            },
-            {
-              href: 'https://www.credly.com/badges/52cd2d7c-d6df-435d-82ba-1ef7aa6144b1/public_url',
-              name: 'Professional Scrum Developer',
-              image: psdBadge,
-            },
-          ]}
-        />
-      </ContentSection>
-
-      <ContentSection dark>
-        <h3 className="text-center">Josh's Experience</h3>
-      </ContentSection>
-
-      <ContentSection>
-        <div className="row">
-          <div className="col-lg-4">
-            <Skills />
-          </div>
-          <div className="col-lg-8 col-sm-">
-            <WorkHistory />
-          </div>
-        </div>
-      </ContentSection>
-    </PageLayout>
-  );
-}
 
 export interface BadgeBarProps {
   readonly badges: Array<{

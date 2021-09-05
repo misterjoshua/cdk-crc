@@ -1,8 +1,10 @@
 import * as cdk from '@aws-cdk/core';
+import * as path from 'path';
 import { Cdn } from './components/cdn';
 import { Dns } from './components/dns';
 import { DomainConfig } from './components/domain-config';
 import { ServerlessNextjs } from './components/serverless-nextjs';
+import { PACKAGES_BASE } from './constants';
 import { RegionalStatefulStack } from './stacks/regional-stateful-stack';
 import { RegionalStatelessStack } from './stacks/regional-stateless-stack';
 
@@ -48,20 +50,22 @@ export class CdkCrcStage extends cdk.Stage {
       env: { region: 'us-east-1' },
     });
 
-    const serverlessNextJs = new ServerlessNextjs(edge, 'Nextjs');
+    const serverlessNextJs = new ServerlessNextjs(edge, 'Nextjs', {
+      lambdaBaseDir: path.join(PACKAGES_BASE, 'frontend', 'out-lambda'),
+    });
 
     // Front the static site and api with a CDN
     const cdn = new Cdn(edge, 'Cdn', {
       domainConfig: props.domainConfig,
       defaultBehavior: serverlessNextJs,
       behaviors: [
+        ...serverlessNextJs.cdnAdditionalBehaviorOptions(),
         {
           path: '/api/*',
           cdnBehaviorOptions: regionalStatelessStack.regionalApi,
         },
       ],
     });
-    serverlessNextJs.addBehaviors(cdn.distribution);
 
     // Configure DNS
     new Dns(edge, 'Dns', {

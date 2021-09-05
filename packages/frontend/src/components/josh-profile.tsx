@@ -6,17 +6,17 @@ import { useScreenSize } from './use-screen-size';
 
 export const JoshProfile: React.FC = () => {
   const number = useHitCount();
-  const dims = useScreenSize();
+  const screenSize = useScreenSize();
 
-  // On big screens, we want this bigger.
-  const imageSize = dims.width > 600 ? 150 : 100;
+  // On big screens, we want the image bigger.
+  const imageSize = screenSize.width < 600 ? 100 : 150;
 
   return (
     <div className="josh-profile text-center">
-      <div style={{ height: imageSize }}>
+      <div>
         <Image
-          src={profilePicture}
           className="josh-inner-profile-img"
+          src={profilePicture}
           width={imageSize}
           height={imageSize}
         />
@@ -50,7 +50,8 @@ export const JoshProfile: React.FC = () => {
       </div>
 
       <p className="josh-profile-view-count">
-        {number && <>Viewed {number} times</>}&nbsp;
+        {number && <>Viewed {number} times</>}
+        &nbsp;
       </p>
 
       <style jsx global>{`
