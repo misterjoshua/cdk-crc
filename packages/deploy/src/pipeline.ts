@@ -2,6 +2,7 @@ import * as cdk from '@aws-cdk/core';
 import {
   CodePipeline,
   CodePipelineSource,
+  ManualApprovalStep,
   ShellStep,
 } from '@aws-cdk/pipelines';
 import { CdkCrcStage } from './cdk-crc-stage';
@@ -57,6 +58,23 @@ export class Pipeline extends cdk.Stack {
           hostedZoneIdParameter: DOMAIN_ZONE_ID_PARAM,
         },
       }),
+    );
+
+    pipeline.addStage(
+      new CdkCrcStage(this, 'CdkCrc-Production', {
+        env: {
+          account: this.account,
+          region: this.region,
+        },
+        domainConfig: {
+          certificateParameter: DOMAIN_CERT_PARAM,
+          domainNames: [`www.${DOMAIN_NAME}`, DOMAIN_NAME],
+          hostedZoneIdParameter: DOMAIN_ZONE_ID_PARAM,
+        },
+      }),
+      {
+        pre: [new ManualApprovalStep('Promote to Production')],
+      },
     );
   }
 }
