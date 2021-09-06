@@ -3,7 +3,6 @@ import * as cdk from '@aws-cdk/core';
 import {
   CodePipeline,
   CodePipelineSource,
-  ManualApprovalStep,
   ShellStep,
 } from '@aws-cdk/pipelines';
 import { CdkCrcStage } from './cdk-crc-stage';
@@ -52,35 +51,37 @@ export class Pipeline extends cdk.Stack {
       dockerEnabledForSelfMutation: true,
     });
 
-    pipeline.addStage(
-      new CdkCrcStage(this, 'CdkCrc-Test', {
-        env: {
-          account: this.account,
-          region: this.region,
-        },
-        domainConfig: {
-          certificateParameter: DOMAIN_CERT_PARAM,
-          domainNames: [`cdk-crc-test.${DOMAIN_NAME}`],
-          hostedZoneIdParameter: DOMAIN_ZONE_ID_PARAM,
-        },
-      }),
-    );
-
-    pipeline.addStage(
-      new CdkCrcStage(this, 'CdkCrc-Production', {
-        env: {
-          account: this.account,
-          region: this.region,
-        },
-        domainConfig: {
-          certificateParameter: DOMAIN_CERT_PARAM,
-          domainNames: [`www.${DOMAIN_NAME}`, DOMAIN_NAME],
-          hostedZoneIdParameter: DOMAIN_ZONE_ID_PARAM,
-        },
-      }),
-      {
-        pre: [new ManualApprovalStep('Promote to Production')],
+    const testStage = new CdkCrcStage(this, 'CdkCrc-Test', {
+      env: {
+        account: this.account,
+        region: this.region,
       },
-    );
+      domainConfig: {
+        certificateParameter: DOMAIN_CERT_PARAM,
+        domainNames: [`cdk-crc-test.${DOMAIN_NAME}`],
+        hostedZoneIdParameter: DOMAIN_ZONE_ID_PARAM,
+      },
+    });
+
+    const prodStage = new CdkCrcStage(this, 'CdkCrc-Production', {
+      env: {
+        account: this.account,
+        region: this.region,
+      },
+      domainConfig: {
+        certificateParameter: DOMAIN_CERT_PARAM,
+        domainNames: [`www.${DOMAIN_NAME}`, DOMAIN_NAME],
+        hostedZoneIdParameter: DOMAIN_ZONE_ID_PARAM,
+      },
+    });
+
+    pipeline.addStage(testStage);
+    pipeline.addStage(prodStage, {
+      // pre: [
+      //   new ManualApprovalStep('Promote to Production', {
+      //     comment: `Go to https://cdk-crc-test.${DOMAIN_NAME}/ to test the site.`,
+      //   }),
+      // ],
+    });
   }
 }
