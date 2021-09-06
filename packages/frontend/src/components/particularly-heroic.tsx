@@ -1,8 +1,18 @@
 import React, { useEffect, useRef } from 'react';
+import { useElementSize } from '../hooks/use-element-size';
 import { AnimationFrameLoop, IAnimatedObject } from './animation-frame-loop';
-import { useElementSize } from './use-element-size';
 
-export const ParticularlyHeroic: React.FC = (props) => {
+export const BASE_HUE_DEFAULT = 250;
+export const BASE_HUE_BLOG = 190;
+
+export interface ParticularlyHeroicProps {
+  readonly baseHue?: number;
+}
+
+export const ParticularlyHeroic: React.FC<ParticularlyHeroicProps> = (
+  props,
+) => {
+  const baseHue = props.baseHue ?? BASE_HUE_DEFAULT;
   const containerRef = useRef<HTMLDivElement>();
   const backgroundCanvasRef = useRef<HTMLCanvasElement>();
   const animationCanvasRef = useRef<HTMLCanvasElement>();
@@ -27,7 +37,7 @@ export const ParticularlyHeroic: React.FC = (props) => {
       canvas: backgroundCanvasRef.current,
       width,
       height,
-      baseHue: 250,
+      baseHue,
     });
 
     const animationFrameLoop = new AnimationFrameLoop({

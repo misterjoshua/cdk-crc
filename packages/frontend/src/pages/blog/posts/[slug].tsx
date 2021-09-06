@@ -2,8 +2,11 @@ import parse from 'html-react-parser';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { ContentSection } from '../../../components/content-section';
+import { DateDisplay } from '../../../components/date-display';
+import { JoshProfile } from '../../../components/josh-profile';
 import { PageLayout } from '../../../components/page-layout';
 import {
+  BASE_HUE_BLOG,
   NiceTranslucentBox,
   ParticularlyHeroic,
 } from '../../../components/particularly-heroic';
@@ -23,12 +26,19 @@ export default function BlogPostPage(props: BlogPostPageIndex) {
         <title>Josh's Blog</title>
       </Head>
 
-      <ParticularlyHeroic>
+      <ParticularlyHeroic baseHue={BASE_HUE_BLOG}>
         <NiceTranslucentBox>
           <h1 className="post-title">{parse(post.title)}</h1>
-          {parse(post.excerpt)}
+          <p>
+            <DateDisplay date={new Date(Date.parse(post.date))} />
+          </p>
+          <div className="text-center">{parse(post.excerpt)}</div>
         </NiceTranslucentBox>
       </ParticularlyHeroic>
+
+      <ContentSection dark>
+        <JoshProfile blogPost />
+      </ContentSection>
 
       <ContentSection>
         <TextBlock>{parse(post.content)}</TextBlock>

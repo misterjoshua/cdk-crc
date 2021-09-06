@@ -1,12 +1,26 @@
 import Image from 'next/image';
 import React from 'react';
 import profilePicture from '../../public/profile-picture.jpg';
-import { useHitCount } from './hit-counter';
-import { useScreenSize } from './use-screen-size';
+import { useHitCount } from '../hooks/use-hit-count';
+import { useScreenSize } from '../hooks/use-screen-size';
 
-export const JoshProfile: React.FC = () => {
+export const HitCount: React.FC = () => {
   const number = useHitCount();
+  return (
+    <p className="hit-count">
+      {number && <>Viewed {number} times</>}
+      &nbsp;
+    </p>
+  );
+};
+
+export interface JoshProfileProps {
+  readonly blogPost?: boolean;
+}
+
+export const JoshProfile: React.FC<JoshProfileProps> = (props) => {
   const screenSize = useScreenSize();
+  const blogPost = props.blogPost ?? false;
 
   // On big screens, we want the image bigger.
   const imageSize = screenSize.width < 600 ? 100 : 150;
@@ -22,8 +36,21 @@ export const JoshProfile: React.FC = () => {
         />
       </div>
 
-      <h1 className="josh-profile-name">Josh Kellendonk</h1>
-      <h2 className="josh-profile-title">Full-Stack, Cloud-Native Developer</h2>
+      {blogPost ? (
+        <>
+          <h2 className="josh-profile-name">Josh Kellendonk</h2>
+          <h3 className="josh-profile-title">
+            Full-Stack, Cloud-Native Developer
+          </h3>
+        </>
+      ) : (
+        <>
+          <h1 className="josh-profile-name">Josh Kellendonk</h1>
+          <h2 className="josh-profile-title">
+            Full-Stack, Cloud-Native Developer
+          </h2>
+        </>
+      )}
 
       <div className="josh-profile-link-banner">
         <a
@@ -49,11 +76,6 @@ export const JoshProfile: React.FC = () => {
         </a>
       </div>
 
-      <p className="josh-profile-view-count">
-        {number && <>Viewed {number} times</>}
-        &nbsp;
-      </p>
-
       <style jsx global>{`
         .josh-inner-profile-img {
           border-radius: 100px;
@@ -64,7 +86,6 @@ export const JoshProfile: React.FC = () => {
           display: flex;
           flex-direction: column;
           justify-content: center;
-          min-height: 50vh;
         }
 
         .josh-profile-name {

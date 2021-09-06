@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ContentSection } from '../../components/content-section';
 import { PageLayout } from '../../components/page-layout';
 import {
+  BASE_HUE_BLOG,
   NiceTranslucentBox,
   ParticularlyHeroic,
 } from '../../components/particularly-heroic';
@@ -25,7 +26,7 @@ export default function BlogIndex(props: BlogIndexProps) {
         <title>Josh's Blog</title>
       </Head>
 
-      <ParticularlyHeroic>
+      <ParticularlyHeroic baseHue={BASE_HUE_BLOG}>
         <NiceTranslucentBox>
           <h1>Josh Kellendonk's Blog</h1>
           <p>
