@@ -24,8 +24,7 @@ export const JoshProfile: React.FC<JoshProfileProps> = (props) => {
   const screenSize = useScreenSize();
   const blogPost = props.blogPost ?? false;
 
-  // On big screens, we want the image bigger.
-  const imageSize = screenSize.width < 600 ? 100 : 150;
+  const imageSize = 125;
 
   return (
     <div className="josh-profile text-center">
