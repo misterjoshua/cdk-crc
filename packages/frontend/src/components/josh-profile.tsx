@@ -35,6 +35,7 @@ export const JoshProfile: React.FC<JoshProfileProps> = (props) => {
           src={profilePicture}
           width={imageSize}
           height={imageSize}
+          alt="Josh's Profile Picture"
         />
       </div>
 
@@ -60,14 +61,14 @@ export const JoshProfile: React.FC<JoshProfileProps> = (props) => {
           title="Josh's GitHub"
           aria-label="View Josh's GitHub"
         >
-          <i className="bi bi-github" aria-label="GitHub" />
+          <i className="bi bi-github" />
         </a>
         <a
           href="https://www.linkedin.com/in/kellendonk/"
           title="Josh's LinkedIn"
           aria-label="View Josh's LinkedIn"
         >
-          <i className="bi bi-linkedin" aria-label="LinkedIn" />
+          <i className="bi bi-linkedin" />
         </a>
       </div>
 

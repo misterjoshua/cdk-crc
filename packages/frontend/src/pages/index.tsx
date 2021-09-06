@@ -285,7 +285,7 @@ export const BadgeBar: React.FC<BadgeBarProps> = (props) => (
   <>
     <div className="badges">
       {props.badges.map((badge, i) => (
-        <a key={i} target="_blank" href={badge.href}>
+        <a key={i} target="_blank" rel="noreferrer" href={badge.href}>
           <Image src={badge.image} width={125} height={125} alt={badge.name} />
         </a>
       ))}
