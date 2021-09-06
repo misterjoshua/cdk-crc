@@ -24,14 +24,18 @@ export default function BlogIndex(props: BlogIndexProps) {
     <PageLayout>
       <Head>
         <title>Josh's Blog</title>
+        <meta
+          name="description"
+          content="A trove of tips for AWS, Containers, Serverless, CDK, and anything in-between."
+        />
       </Head>
 
       <ParticularlyHeroic baseHue={BASE_HUE_BLOG}>
         <NiceTranslucentBox>
-          <h1>Josh Kellendonk's Blog</h1>
+          <h1>Josh's Blog</h1>
           <p>
-            Josh's ruminations on AWS, Containers, Serverless, and anything in
-            between.
+            A trove of tips for AWS, Containers, Serverless, CDK, and anything
+            in-between.
           </p>
         </NiceTranslucentBox>
       </ParticularlyHeroic>

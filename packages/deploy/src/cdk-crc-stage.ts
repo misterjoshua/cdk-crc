@@ -7,6 +7,7 @@ import { ServerlessNextjs } from './components/serverless-nextjs';
 import { PACKAGES_BASE } from './constants';
 import { RegionalStatefulStack } from './stacks/regional-stateful-stack';
 import { RegionalStatelessStack } from './stacks/regional-stateless-stack';
+import { TestStack } from './stacks/test-stack';
 
 /**
  * Props for `CdkCrcStage`
@@ -46,8 +47,9 @@ export class CdkCrcStage extends cdk.Stage {
     );
 
     // Edge/L@E resources in us-east-1
+    const edgeEnv = { region: 'us-east-1' };
     const edge = new cdk.Stack(this, 'Edge', {
-      env: { region: 'us-east-1' },
+      env: edgeEnv,
     });
 
     const serverlessNextJs = new ServerlessNextjs(edge, 'Nextjs', {
@@ -68,9 +70,19 @@ export class CdkCrcStage extends cdk.Stage {
     });
 
     // Configure DNS
-    new Dns(edge, 'Dns', {
+    const dns = new Dns(edge, 'Dns', {
       cdn: cdn,
       domainConfig: props.domainConfig,
     });
+
+    // Add a testing stack to the stage that depends on all the rest so that it can
+    // run after.
+    const testStack = new TestStack(this, 'TestStack', {
+      env: edgeEnv,
+      mainDomain: dns.mainDomain,
+    });
+    testStack.addDependency(regionalStatefulStack);
+    testStack.addDependency(regionalStatelessStack);
+    testStack.addDependency(edge);
   }
 }

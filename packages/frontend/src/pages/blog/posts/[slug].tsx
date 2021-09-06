@@ -24,7 +24,8 @@ export default function BlogPostPage(props: BlogPostPageIndex) {
   return (
     <PageLayout>
       <Head>
-        <title>Josh's Blog</title>
+        <title>{parse(post.title)} - Josh's Blog</title>
+        <meta name="description" content={post.excerpt} />
       </Head>
 
       <ParticularlyHeroic baseHue={BASE_HUE_BLOG}>

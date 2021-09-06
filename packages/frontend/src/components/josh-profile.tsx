@@ -8,7 +8,9 @@ export const HitCount: React.FC = () => {
   const number = useHitCount();
   return (
     <p className="hit-count">
-      {number && <>Viewed {number} times</>}
+      {number && (
+        <span className="hit-count-loaded">Viewed {number} times</span>
+      )}
       &nbsp;
     </p>
   );
