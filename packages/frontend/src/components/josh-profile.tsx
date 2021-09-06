@@ -2,7 +2,6 @@ import Image from 'next/image';
 import React from 'react';
 import profilePicture from '../../public/profile-picture.jpg';
 import { useHitCount } from '../hooks/use-hit-count';
-import { useScreenSize } from '../hooks/use-screen-size';
 
 export const HitCount: React.FC = () => {
   const number = useHitCount();
@@ -21,7 +20,6 @@ export interface JoshProfileProps {
 }
 
 export const JoshProfile: React.FC<JoshProfileProps> = (props) => {
-  const screenSize = useScreenSize();
   const blogPost = props.blogPost ?? false;
 
   const imageSize = 125;
