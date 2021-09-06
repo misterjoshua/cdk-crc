@@ -394,7 +394,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-cdk/aws-cloudwatch@npm:1.121.0":
+"@aws-cdk/aws-cloudwatch@npm:1.121.0, @aws-cdk/aws-cloudwatch@npm:^1.121.0":
   version: 1.121.0
   resolution: "@aws-cdk/aws-cloudwatch@npm:1.121.0"
   dependencies:
@@ -8162,6 +8162,7 @@ __metadata:
     "@aws-cdk/aws-certificatemanager": ^1.121.0
     "@aws-cdk/aws-cloudfront": ^1.121.0
     "@aws-cdk/aws-cloudfront-origins": ^1.121.0
+    "@aws-cdk/aws-cloudwatch": ^1.121.0
     "@aws-cdk/aws-codepipeline": ^1.121.0
     "@aws-cdk/aws-dynamodb": ^1.121.0
     "@aws-cdk/aws-ec2": ^1.121.0
