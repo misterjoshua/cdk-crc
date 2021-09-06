@@ -10,7 +10,7 @@ import {
   ParticularlyHeroic,
 } from '../../components/particularly-heroic';
 import { PostInfoDisplay } from '../../components/post-info-display';
-import { TextBlock } from '../../components/text-block';
+import { EasyReading, TextBlock } from '../../components/text-block';
 import { BlogData, BlogPost, getBlogHref } from '../../util/blog';
 
 export interface BlogIndexProps {
@@ -75,19 +75,21 @@ export const BlogPostPreviewDisplay: React.FC<BlogPostPreviewDisplayProps> = (
 
   return (
     <section className="index-post">
-      <h2 className="index-post-title">
-        <Link href={getBlogHref(post)}>{parse(post.title)}</Link>
-      </h2>
+      <EasyReading>
+        <h2 className="index-post-title">
+          <Link href={getBlogHref(post)}>{parse(post.title)}</Link>
+        </h2>
 
-      <PostInfoDisplay post={post} />
+        <PostInfoDisplay post={post} />
 
-      {parse(post.excerpt)}
+        {parse(post.excerpt)}
 
-      <style jsx>{`
-        section {
-          padding: 1rem;
-        }
-      `}</style>
+        <style jsx>{`
+          section {
+            padding: 1rem;
+          }
+        `}</style>
+      </EasyReading>
     </section>
   );
 };

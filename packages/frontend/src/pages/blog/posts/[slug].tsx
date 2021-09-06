@@ -10,7 +10,8 @@ import {
   NiceTranslucentBox,
   ParticularlyHeroic,
 } from '../../../components/particularly-heroic';
-import { TextBlock } from '../../../components/text-block';
+import { EasyReading, TextBlock } from '../../../components/text-block';
+import { WordpressContentDisplay } from '../../../components/wordpress-content-display';
 import { BlogData, BlogPost } from '../../../util/blog';
 
 export interface BlogPostPageIndex {
@@ -32,7 +33,9 @@ export default function BlogPostPage(props: BlogPostPageIndex) {
           <p>
             <DateDisplay date={new Date(Date.parse(post.date))} />
           </p>
-          <div className="text-center">{parse(post.excerpt)}</div>
+          <EasyReading>
+            <div className="text-center">{parse(post.excerpt)}</div>
+          </EasyReading>
         </NiceTranslucentBox>
       </ParticularlyHeroic>
 
@@ -41,7 +44,11 @@ export default function BlogPostPage(props: BlogPostPageIndex) {
       </ContentSection>
 
       <ContentSection>
-        <TextBlock>{parse(post.content)}</TextBlock>
+        <TextBlock>
+          <EasyReading>
+            <WordpressContentDisplay content={post.content} />
+          </EasyReading>
+        </TextBlock>
       </ContentSection>
 
       <style jsx>{`

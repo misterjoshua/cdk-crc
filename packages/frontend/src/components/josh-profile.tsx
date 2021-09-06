@@ -67,13 +67,6 @@ export const JoshProfile: React.FC<JoshProfileProps> = (props) => {
         >
           <i className="bi bi-linkedin" aria-label="LinkedIn" />
         </a>
-        <a
-          href="https://www.linkedin.com/in/kellendonk/"
-          title="Contact Josh"
-          aria-label="Contact Josh Kellendonk"
-        >
-          <i className="bi bi-telephone-outbound" />
-        </a>
       </div>
 
       <style jsx global>{`

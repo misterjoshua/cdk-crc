@@ -6,38 +6,42 @@ import psdBadge from '../../public/badges/professional-scrum-developer-i-psd-i.p
 import psmBadge from '../../public/badges/professional-scrum-master-i-psm-i.png';
 import pspoBadge from '../../public/badges/professional-scrum-product-owner-i-pspo-i.png';
 import { ContentSection } from '../components/content-section';
-import { JoshProfile } from '../components/josh-profile';
+import { HitCount, JoshProfile } from '../components/josh-profile';
 import { PageLayout } from '../components/page-layout';
 import {
   NiceTranslucentBox,
   ParticularlyHeroic,
 } from '../components/particularly-heroic';
-import { TextBlock } from '../components/text-block';
+import { EasyReading, TextBlock } from '../components/text-block';
 
 export default function Home() {
   return (
     <PageLayout>
       <Head>
         <title>Josh Kellendonk</title>
-        <meta name="description" content="Josh Kellendonk's website." />
+        <meta name="description" content="Josh Kellendonk's website" />
       </Head>
 
       <ParticularlyHeroic>
         <NiceTranslucentBox>
           <JoshProfile />
+          <HitCount />
         </NiceTranslucentBox>
       </ParticularlyHeroic>
 
       <ContentSection>
         <TextBlock>
-          <h3 className="text-center">About Josh</h3>
-          <p>
-            Josh is a driven entrepreneur and professional developer, relentless
-            about producing great value for customers. Using his advanced
-            knowledge and experience with cloud-native architectures, Josh
-            builds reliable, scalable, and cost-conscious business solutions.
-            Josh will make an excellent addition to your projects and your team.
-          </p>
+          <EasyReading>
+            <h3 className="text-center">About Josh</h3>
+            <p>
+              Josh is a driven entrepreneur and professional developer,
+              relentless about producing great value for customers. Using his
+              advanced knowledge and experience with cloud-native architectures,
+              Josh builds reliable, scalable, and cost-conscious business
+              solutions. Josh will make an excellent addition to your projects
+              and your team.
+            </p>
+          </EasyReading>
         </TextBlock>
       </ContentSection>
 
