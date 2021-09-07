@@ -37,16 +37,14 @@ export default function Home() {
             <h3 className="text-center">About Josh</h3>
             <p>
               Josh is a driven entrepreneur, cloud-native developer, and
-              team-player. Using greater than ten years of experience in the
+              team-player. Using his greater than ten years of experience in the
               cloud, Josh builds reliable, scalable, and cost-efficient business
               solutions. No matter the project, Josh will make an excellent
               addition to your team.
             </p>
           </EasyReading>
         </TextBlock>
-      </ContentSection>
 
-      <ContentSection>
         <h3 className="text-center">Certifications</h3>
 
         <BadgeBar
