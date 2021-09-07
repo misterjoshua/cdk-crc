@@ -24,6 +24,7 @@ import {
   BLOG_REVALIDATION_SECONDS,
 } from '../../../util/blog';
 import { getQueryParam } from '../../../util/get-query-param';
+import { stripTags } from '../../../util/strip-tags';
 
 export interface BlogPostPageProps {
   readonly post: BlogPost;
@@ -36,7 +37,7 @@ export default function BlogPostPage(props: BlogPostPageProps) {
     <PageLayout>
       <Head>
         <title>{parse(post.title)} - Josh's Blog</title>
-        <meta name="description" content={post.excerpt} />
+        <meta name="description" content={stripTags(post.excerpt)} />
       </Head>
 
       <ParticularlyHeroic baseHue={BASE_HUE_BLOG}>
