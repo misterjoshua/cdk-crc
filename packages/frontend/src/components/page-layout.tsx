@@ -29,14 +29,6 @@ function MainNav() {
         <div className={`${collapsed ? 'collapse ' : ''}navbar-collapse`}>
           <ul className="navbar-nav mr-auto">
             <li className="nav-item">
-              <Link passHref href="/">
-                <a href="" className="nav-link active">
-                  Home
-                </a>
-              </Link>
-            </li>
-
-            <li className="nav-item">
               <Link passHref href="/blog">
                 <a href="" className="nav-link">
                   Blog
