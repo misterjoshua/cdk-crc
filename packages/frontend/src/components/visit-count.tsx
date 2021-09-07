@@ -23,7 +23,7 @@ export function useVisitCount(): number {
 
       const res = await fetch(host);
       const resJson = await res.json();
-      const hitCount = resJson.hitCount;
+      const hitCount = resJson.visitCount;
       setVisitCount(hitCount);
     }
 
