@@ -40,8 +40,19 @@ export default function BlogPostPage(props: BlogPostPageProps) {
         <meta name="description" content={stripTags(post.excerpt)} />
         <meta property="og:title" content={stripTags(post.title)} />
         <meta property="og:description" content={stripTags(post.excerpt)} />
-        {post.featuredImageUrl && (
-          <meta property="og:image" content={post.featuredImageUrl} />
+
+        <meta name="twitter:site" content="@eigenseries" />
+        <meta name="twitter:creator" content="@eigenseries" />
+
+        {post.featuredImageUrl ? (
+          <>
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta property="og:image" content={post.featuredImageUrl} />
+          </>
+        ) : (
+          <>
+            <meta name="twitter:card" content="summary" />
+          </>
         )}
       </Head>
 
