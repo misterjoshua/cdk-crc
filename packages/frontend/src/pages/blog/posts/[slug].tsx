@@ -42,7 +42,7 @@ export default function BlogPostPage(props: BlogPostPageProps) {
       <ParticularlyHeroic baseHue={BASE_HUE_BLOG}>
         <NiceTranslucentBox>
           <EasyReading>
-            <h1 className="text-center">{parse(post.title)}</h1>
+            <h1 className="post-title text-center">{parse(post.title)}</h1>
             <p className="text-center">
               <DateDisplay date={new Date(Date.parse(post.date))} />
             </p>
