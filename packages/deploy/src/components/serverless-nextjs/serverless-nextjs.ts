@@ -8,6 +8,7 @@ import { AddCdnBehaviorOptions, ICdnBehaviorOptions } from '../cdn';
 import { AssetsDeployment } from './assets-deployment';
 import { DefaultLambda } from './default-lambda';
 import { ImageLambda } from './image-lambda';
+import { IncrementalStaticRegeneration } from './incremental-static-regeneration';
 import { StaticAssets } from './static-assets';
 
 export interface ServerlessNextjsProps {
@@ -19,7 +20,7 @@ export interface ServerlessNextjsProps {
 }
 
 /**
- * Deploy Next.js as Lambda @ Edge.
+ * Deploy Next.js as Lambda@Edge.
  * @see https://github.com/serverless-nextjs/serverless-next.js#architecture
  */
 export class ServerlessNextjs
@@ -29,8 +30,9 @@ export class ServerlessNextjs
   private readonly lambdaBaseDir: string;
   private readonly bucket: s3.Bucket;
   private readonly defaultLambda: DefaultLambda;
-  private readonly imageLambda?: ImageLambda;
   private readonly bucketAssets: StaticAssets;
+  private readonly imageLambda?: ImageLambda;
+  private readonly incrementalStaticRegeneration?: IncrementalStaticRegeneration;
 
   constructor(scope: cdk.Construct, id: string, props: ServerlessNextjsProps) {
     super(scope, id);
@@ -45,22 +47,35 @@ export class ServerlessNextjs
       assetsDir: path.join(this.lambdaBaseDir, 'assets'),
     });
 
-    this.defaultLambda = new DefaultLambda(this, 'Default', {
-      bucket: this.bucket,
-      defaultLambdaDir: path.join(this.lambdaBaseDir, 'default-lambda'),
-    });
-
     this.bucketAssets = new StaticAssets(this, 'BucketAssets', {
-      bucket: this.bucket,
+      originBucket: this.bucket,
     });
 
     const imageLambdaPath = this.getOutputPath('image-lambda');
     if (imageLambdaPath) {
       this.imageLambda = new ImageLambda(this, 'ImageLambda', {
-        bucket: this.bucket,
+        originBucket: this.bucket,
         imageLambdaPath,
       });
     }
+
+    const regenerationLambdaPath = this.getOutputPath('regeneration-lambda');
+    if (regenerationLambdaPath) {
+      this.incrementalStaticRegeneration = new IncrementalStaticRegeneration(
+        this,
+        'IncrementalStaticRegeneration',
+        {
+          originBucket: this.bucket,
+          regenerationLambdaPath,
+        },
+      );
+    }
+
+    this.defaultLambda = new DefaultLambda(this, 'Default', {
+      bucket: this.bucket,
+      incrementalStatusGeneration: this.incrementalStaticRegeneration,
+      defaultLambdaDir: path.join(this.lambdaBaseDir, 'default-lambda'),
+    });
   }
 
   private getOutputPath(outputPath: string) {
@@ -86,10 +101,12 @@ export class ServerlessNextjs
 
     addCdnBehaviorOptions.push(
       {
+        // Next.js build assets
         path: '_next/*',
         cdnBehaviorOptions: this.bucketAssets,
       },
       {
+        // User static assets
         path: 'static/*',
         cdnBehaviorOptions: this.bucketAssets,
       },

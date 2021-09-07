@@ -32,18 +32,20 @@ export class AssetsDeployment extends cdk.Construct {
 }
 
 interface AssetDeploymentConfig {
+  /** Subdirectory of assets and destination key prefix */
   readonly assetPath: string;
+  /** Cache headers */
   readonly cacheControl: s3_deployment.CacheControl;
 }
 
-const CACHE_CONTROL_IMMUTABLE = s3_deployment.CacheControl.fromString(
-  'public, max-age=31536000, immutable',
+const CACHE_CONTROL_PUBLIC = s3_deployment.CacheControl.fromString(
+  'public, max-age=31536000, must-revalidate',
 );
 const CACHE_CONTROL_SERVER = s3_deployment.CacheControl.fromString(
   'public, max-age=0, s-maxage=2678400, must-revalidate',
 );
-const CACHE_CONTROL_PUBLIC = s3_deployment.CacheControl.fromString(
-  'public, max-age=31536000, must-revalidate',
+const CACHE_CONTROL_IMMUTABLE = s3_deployment.CacheControl.fromString(
+  'public, max-age=31536000, immutable',
 );
 
 const ASSET_DEPLOYMENT_CONFIGS: AssetDeploymentConfig[] = [

@@ -11,19 +11,3 @@ export const TextBlock: React.FC = (props) => (
     `}</style>
   </div>
 );
-
-export const EasyReading: React.FC = (props) => (
-  <div className="easy-reading">
-    {props.children}
-
-    <style jsx global>{`
-      .easy-reading {
-        font-size: 1.3rem;
-        line-height: 2;
-      }
-      .easy-reading p {
-        margin-bottom: 2rem;
-      }
-    `}</style>
-  </div>
-);

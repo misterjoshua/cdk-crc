@@ -1,8 +1,13 @@
 import parse from 'html-react-parser';
-import { GetServerSideProps } from 'next';
+import {
+  GetStaticPathsResult,
+  GetStaticPropsContext,
+  GetStaticPropsResult,
+} from 'next';
 import Head from 'next/head';
 import { ContentSection } from '../../../components/content-section';
 import { DateDisplay } from '../../../components/date-display';
+import { EasyReading } from '../../../components/easy-reading';
 import { JoshProfile } from '../../../components/josh-profile';
 import { PageLayout } from '../../../components/page-layout';
 import {
@@ -10,15 +15,21 @@ import {
   NiceTranslucentBox,
   ParticularlyHeroic,
 } from '../../../components/particularly-heroic';
-import { EasyReading, TextBlock } from '../../../components/text-block';
+import { TextBlock } from '../../../components/text-block';
 import { WordpressContentDisplay } from '../../../components/wordpress-content-display';
-import { BlogData, BlogPost } from '../../../util/blog';
+import {
+  BlogData,
+  BlogDataNotFoundError,
+  BlogPost,
+  BLOG_REVALIDATION_SECONDS,
+} from '../../../util/blog';
+import { getQueryParam } from '../../../util/get-query-param';
 
-export interface BlogPostPageIndex {
+export interface BlogPostPageProps {
   readonly post: BlogPost;
 }
 
-export default function BlogPostPage(props: BlogPostPageIndex) {
+export default function BlogPostPage(props: BlogPostPageProps) {
   const post = props.post;
 
   return (
@@ -30,11 +41,11 @@ export default function BlogPostPage(props: BlogPostPageIndex) {
 
       <ParticularlyHeroic baseHue={BASE_HUE_BLOG}>
         <NiceTranslucentBox>
-          <h1 className="post-title">{parse(post.title)}</h1>
-          <p>
-            <DateDisplay date={new Date(Date.parse(post.date))} />
-          </p>
           <EasyReading>
+            <h1 className="text-center">{parse(post.title)}</h1>
+            <p className="text-center">
+              <DateDisplay date={new Date(Date.parse(post.date))} />
+            </p>
             <div className="text-center">{parse(post.excerpt)}</div>
           </EasyReading>
         </NiceTranslucentBox>
@@ -51,27 +62,37 @@ export default function BlogPostPage(props: BlogPostPageIndex) {
           </EasyReading>
         </TextBlock>
       </ContentSection>
-
-      <style jsx>{`
-        .post-title {
-          font-size: 1.5rem;
-        }
-      `}</style>
     </PageLayout>
   );
 }
 
-export const getServerSideProps: GetServerSideProps<BlogPostPageIndex> = async (
-  context,
-) => {
-  const slug = Array.isArray(context.query.slug)
-    ? context.query.slug[0]
-    : context.query.slug;
-  const blogData = BlogData.get();
+export async function getStaticProps(
+  context: GetStaticPropsContext,
+): Promise<GetStaticPropsResult<BlogPostPageProps>> {
+  const slug = getQueryParam(context.params, 'slug');
 
+  try {
+    const post = await BlogData.instance().getPostBySlug(slug);
+    return {
+      props: { post },
+      revalidate: BLOG_REVALIDATION_SECONDS,
+    };
+  } catch (e) {
+    if (e instanceof BlogDataNotFoundError) {
+      return {
+        notFound: true,
+        revalidate: BLOG_REVALIDATION_SECONDS,
+      };
+    }
+
+    throw e;
+  }
+}
+
+export async function getStaticPaths(): Promise<GetStaticPathsResult> {
   return {
-    props: {
-      post: await blogData.getPostBySlug(slug),
-    },
+    // We depend on fallback rendering for all the blog posts.
+    paths: [],
+    fallback: 'blocking',
   };
-};
+}

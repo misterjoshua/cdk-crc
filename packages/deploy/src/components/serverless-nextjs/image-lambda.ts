@@ -1,36 +1,41 @@
 import * as cloudfront from '@aws-cdk/aws-cloudfront';
 import * as cloudfront_origins from '@aws-cdk/aws-cloudfront-origins';
 import * as lambda from '@aws-cdk/aws-lambda';
+import * as s3 from '@aws-cdk/aws-s3';
 import * as cdk from '@aws-cdk/core';
 import { ICdnBehaviorOptions } from '../cdn';
-import { ComponentBaseProps } from './component';
-import { LAMBDA_AT_EDGE_RUNTIME } from './constants';
+import { NEXTJS_LAMBDA_RUNTIME } from './constants';
+import { LambdaAtEdgeRole } from './lambda-at-edge-role';
 
-export interface ImageLambdaProps extends ComponentBaseProps {
+export interface ImageLambdaProps {
+  /** The origin bucket in which to find image assets */
+  readonly originBucket: s3.IBucket;
   /** Path of the directory containing the image lambda handler */
   readonly imageLambdaPath: string;
 }
 
-/** Create an image lambda that handles optimization */
+/** Create an image lambda that handles image optimization */
 export class ImageLambda extends cdk.Construct implements ICdnBehaviorOptions {
   private readonly cachePolicy: cloudfront.CachePolicy;
   private readonly lambda: lambda.Function;
-  private readonly originRequestPolicy: cloudfront.OriginRequestPolicy;
   private readonly origin: cloudfront_origins.S3Origin;
+  private readonly originRequestPolicy: cloudfront.OriginRequestPolicy;
 
   constructor(scope: cdk.Construct, id: string, props: ImageLambdaProps) {
     super(scope, id);
 
-    this.origin = new cloudfront_origins.S3Origin(props.bucket);
+    this.origin = new cloudfront_origins.S3Origin(props.originBucket);
 
     this.lambda = new lambda.Function(this, 'Lambda', {
-      runtime: LAMBDA_AT_EDGE_RUNTIME,
+      runtime: NEXTJS_LAMBDA_RUNTIME,
       code: lambda.Code.fromAsset(props.imageLambdaPath),
       handler: 'index.handler',
-      memorySize: 2048, // Needs a lot of memory or it runs quite slowly.
+      role: new LambdaAtEdgeRole(this, 'Role'),
       timeout: cdk.Duration.seconds(30),
+      // The Lambda needs a fair bit of memory or it runs quite slowly.
+      memorySize: 2048,
     });
-    props.bucket.grantReadWrite(this.lambda);
+    props.originBucket.grantReadWrite(this.lambda);
 
     this.originRequestPolicy = new cloudfront.OriginRequestPolicy(
       this,

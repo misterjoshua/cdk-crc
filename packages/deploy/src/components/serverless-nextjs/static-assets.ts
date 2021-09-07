@@ -6,7 +6,7 @@ import { ICdnBehaviorOptions } from '../cdn';
 
 export interface StaticAssetsProps {
   /** The bucket to create as an origin containing the assets */
-  readonly bucket: s3.IBucket;
+  readonly originBucket: s3.IBucket;
 }
 
 /** Creates CDN Behavior Options for static assets */
@@ -17,7 +17,7 @@ export class StaticAssets extends cdk.Construct implements ICdnBehaviorOptions {
   constructor(scope: cdk.Construct, id: string, props: StaticAssetsProps) {
     super(scope, id);
 
-    this.origin = new cloudfront_origins.S3Origin(props.bucket);
+    this.origin = new cloudfront_origins.S3Origin(props.originBucket);
 
     this.cachePolicy = new cloudfront.CachePolicy(this, 'CachePolicy', {
       queryStringBehavior: cloudfront.CacheQueryStringBehavior.none(),

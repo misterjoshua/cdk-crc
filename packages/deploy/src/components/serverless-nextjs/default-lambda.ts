@@ -1,12 +1,16 @@
 import * as cloudfront from '@aws-cdk/aws-cloudfront';
 import * as cloudfront_origins from '@aws-cdk/aws-cloudfront-origins';
 import * as lambda from '@aws-cdk/aws-lambda';
+import * as s3 from '@aws-cdk/aws-s3';
 import * as cdk from '@aws-cdk/core';
 import { ICdnBehaviorOptions } from '../cdn';
-import { ComponentBaseProps } from './component';
-import { LAMBDA_AT_EDGE_RUNTIME } from './constants';
+import { NEXTJS_LAMBDA_RUNTIME } from './constants';
+import { IncrementalStaticRegeneration } from './incremental-static-regeneration';
+import { LambdaAtEdgeRole } from './lambda-at-edge-role';
 
-export interface DefaultLambdaProps extends ComponentBaseProps {
+export interface DefaultLambdaProps {
+  readonly bucket: s3.IBucket;
+  readonly incrementalStatusGeneration?: IncrementalStaticRegeneration;
   readonly defaultLambdaDir: string;
 }
 
@@ -14,7 +18,7 @@ export class DefaultLambda
   extends cdk.Construct
   implements ICdnBehaviorOptions
 {
-  private readonly defaultLambda: lambda.Function;
+  public readonly defaultLambda: lambda.Function;
   private readonly origin: cloudfront_origins.S3Origin;
   private readonly cachePolicy: cloudfront.ICachePolicy;
 
@@ -22,17 +26,25 @@ export class DefaultLambda
     super(scope, id);
 
     this.origin = new cloudfront_origins.S3Origin(props.bucket);
+    this.cachePolicy = cloudfront.CachePolicy.CACHING_DISABLED;
 
     this.defaultLambda = new lambda.Function(this, 'Lambda', {
-      runtime: LAMBDA_AT_EDGE_RUNTIME,
+      runtime: NEXTJS_LAMBDA_RUNTIME,
       code: lambda.Code.fromAsset(props.defaultLambdaDir),
       handler: 'index.handler',
+      role: new LambdaAtEdgeRole(this, 'Role'),
       memorySize: 512,
       timeout: cdk.Duration.seconds(30),
     });
     props.bucket.grantReadWrite(this.defaultLambda);
 
-    this.cachePolicy = cloudfront.CachePolicy.CACHING_DISABLED;
+    const regenerationLambda = props.incrementalStatusGeneration;
+    if (regenerationLambda) {
+      regenerationLambda.regenerationQueue.grantSendMessages(
+        this.defaultLambda,
+      );
+      regenerationLambda.regenerationFunction.grantInvoke(this.defaultLambda);
+    }
   }
 
   cdnBehaviorOptions(scope: cdk.Construct): cloudfront.BehaviorOptions {
