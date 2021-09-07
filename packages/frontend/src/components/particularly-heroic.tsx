@@ -6,6 +6,7 @@ export const BASE_HUE_DEFAULT = 250;
 export const BASE_HUE_BLOG = 190;
 
 export interface ParticularlyHeroicProps {
+  /** Base hue value (HSL) */
   readonly baseHue?: number;
 }
 
@@ -32,16 +33,9 @@ export const ParticularlyHeroic: React.FC<ParticularlyHeroicProps> = (
       canvas.height = height;
     }
 
-    // Draw this once and give it to the animation frame loop.
-    drawBackgroundCanvas({
-      canvas: backgroundCanvasRef.current,
-      width,
-      height,
-      baseHue,
-    });
-
     const animationFrameLoop = new AnimationFrameLoop({
       animatedObject: new CirclesAnimation({
+        baseHue,
         backgroundImage: backgroundCanvasRef.current,
         canvas: animationCanvasRef.current,
         worldWidth: width,
@@ -98,6 +92,8 @@ export interface IDrawableObject extends IAnimatedObject {
 }
 
 export interface CirclesAnimationOptions {
+  /** The base hue for the background image */
+  readonly baseHue: number;
   /** Background image for the animation */
   readonly backgroundImage: HTMLCanvasElement;
   /** Canvas for drawing the animation */
@@ -110,17 +106,21 @@ export interface CirclesAnimationOptions {
 
 /** Animate some nice-looking circles by tracking particles */
 export class CirclesAnimation implements IAnimatedObject {
-  /** Image drawn behind */
+  private readonly baseHue: number;
   private readonly backgroundImage: HTMLCanvasElement;
+  /** Whether the background image has been drawn */
+  private backgroundImageDrawn = false;
+
   /** Rendering context for the animated canvas */
   private readonly context: CanvasRenderingContext2D;
+  private readonly sprites: CircleSprite[] = [];
 
+  /** Dimensions of the world */
   public readonly worldWidth: number;
   public readonly worldHeight: number;
 
-  private readonly sprites: CircleSprite[] = [];
-
   constructor(options: CirclesAnimationOptions) {
+    this.baseHue = options.baseHue;
     this.backgroundImage = options.backgroundImage;
     this.context = options.canvas.getContext('2d');
 
@@ -145,14 +145,27 @@ export class CirclesAnimation implements IAnimatedObject {
   }
 
   public update(deltaTime: number) {
+    if (!this.backgroundImageDrawn) {
+      // Draw this only once.
+      drawBackgroundCanvas({
+        canvas: this.backgroundImage,
+        width: this.worldWidth,
+        height: this.worldHeight,
+        baseHue: this.baseHue,
+      });
+      this.backgroundImageDrawn = true;
+    }
+
     const ctx = this.context;
-
     ctx.clearRect(0, 0, this.worldWidth, this.worldHeight);
-
     ctx.globalCompositeOperation = 'source-over';
     ctx.shadowBlur = 0;
     ctx.drawImage(this.backgroundImage, 0, 0);
+
+    // Optimize the context changes by setting context state here
     ctx.globalCompositeOperation = 'lighter';
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = '#fff';
 
     for (const sprite of this.sprites) {
       sprite.update(deltaTime);
@@ -171,10 +184,23 @@ export interface CircleSpriteState {
 }
 
 class CircleSprite implements IDrawableObject {
+  /** Base line alpha - expect flickering above and below this value. */
+  private readonly baseLineAlpha = 0.075;
+  /** Extremes of the flicker*/
+  private readonly flickerRange = 0.05;
+  /** How fast to flicker */
+  private readonly flickerRate = 0.0015;
+
   constructor(
     private readonly world: CirclesAnimation,
     private readonly state: CircleSpriteState,
-  ) {}
+  ) {
+    // Remember: You don't want (baselineAlpha + flickerRange) > 1, nor
+    // (baselineAlpha - flickerRange) < 0. Otherwise, you'll clip.
+    this.flickerRate = 0.0015;
+    this.flickerRange = 0.05;
+    this.baseLineAlpha = 0.075;
+  }
 
   update(deltaTime: number) {
     const state = this.state;
@@ -199,17 +225,26 @@ class CircleSprite implements IDrawableObject {
     if (state.y + state.radius < 0)
       state.y = this.world.worldHeight + state.radius;
 
-    // Increase the tick
-    state.tick = (state.tick + 1) % 10000;
+    // Increase the tick by the time since the last update.
+    state.tick = state.tick + deltaTime;
   }
 
   draw(ctx: CanvasRenderingContext2D) {
     const state = this.state;
-    ctx.shadowBlur = 15;
-    ctx.shadowColor = '#fff';
+
+    // How fast to flicker
+    const flickerRate = this.flickerRate;
+    // Extremes of the flicker
+    const flickerRange = this.flickerRange;
+    // Baseline of flicker. Expect flickering above and below this value.
+    const flickerBaseLine = this.baseLineAlpha;
+
+    const fillAlpha =
+      flickerBaseLine + Math.cos(state.tick * flickerRate) * flickerRange;
+
     ctx.beginPath();
     ctx.arc(state.x, state.y, state.radius, 0, FULL_CIRCLE);
-    ctx.fillStyle = hsla(0, 0, 100, 0.075 + Math.cos(state.tick * 0.02) * 0.05);
+    ctx.fillStyle = `hsla(0,0%,100%,${fillAlpha})`; // Minimized concatenation
     ctx.fill();
   }
 }

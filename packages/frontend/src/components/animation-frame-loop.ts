@@ -1,7 +1,7 @@
 /** Interface for a type that can be animated */
 export interface IAnimatedObject {
   /** Update the animated object */
-  update(deltaT: number);
+  update(deltaTime: number);
 }
 
 export interface AnimationFrameLoopOptions {
