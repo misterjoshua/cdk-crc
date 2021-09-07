@@ -1,19 +1,6 @@
 import Image from 'next/image';
 import React from 'react';
 import profilePicture from '../../public/profile-picture.jpg';
-import { useHitCount } from '../hooks/use-hit-count';
-
-export const HitCount: React.FC = () => {
-  const number = useHitCount();
-  return (
-    <p className="hit-count">
-      {number && (
-        <span className="hit-count-loaded">Viewed {number} times</span>
-      )}
-      &nbsp;
-    </p>
-  );
-};
 
 export interface JoshProfileProps {
   readonly blogPost?: boolean;

@@ -31,16 +31,16 @@ export class Api extends cdk.Construct implements ICdnBehaviorOptions {
   constructor(scope: cdk.Construct, id: string, props: ApiProps) {
     super(scope, id);
 
-    const hitsHandler = new lambda.Function(this, 'Handler', {
+    const visitsHandler = new lambda.Function(this, 'Handler', {
       code: lambda.Code.fromAsset(api.getAssetDir()),
       runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'functions/hits.handler',
+      handler: 'functions/visits.handler',
       environment: {
         [api.FUNCTION_DATABASE_ENV_NAME]: props.database.table.tableName,
       },
     });
 
-    props.database.table.grantReadWriteData(hitsHandler);
+    props.database.table.grantReadWriteData(visitsHandler);
 
     this.httpApi = new apigwv2.HttpApi(this, 'HttpApi', {
       corsPreflight: {
@@ -50,11 +50,11 @@ export class Api extends cdk.Construct implements ICdnBehaviorOptions {
       },
     });
 
-    new apigwv2.HttpRoute(this, 'Hits', {
+    new apigwv2.HttpRoute(this, 'Visits', {
       httpApi: this.httpApi,
-      routeKey: apigwv2.HttpRouteKey.with('/api/hits'),
+      routeKey: apigwv2.HttpRouteKey.with('/api/visits'),
       integration: new apigwv2_integrations.LambdaProxyIntegration({
-        handler: hitsHandler,
+        handler: visitsHandler,
       }),
     });
 

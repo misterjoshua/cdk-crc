@@ -7,13 +7,14 @@ import psmBadge from '../../public/badges/professional-scrum-master-i-psm-i.png'
 import pspoBadge from '../../public/badges/professional-scrum-product-owner-i-pspo-i.png';
 import { ContentSection } from '../components/content-section';
 import { EasyReading } from '../components/easy-reading';
-import { HitCount, JoshProfile } from '../components/josh-profile';
+import { JoshProfile } from '../components/josh-profile';
 import { PageLayout } from '../components/page-layout';
 import {
   NiceTranslucentBox,
   ParticularlyHeroic,
 } from '../components/particularly-heroic';
 import { TextBlock } from '../components/text-block';
+import { VisitCount } from '../components/visit-count';
 
 export default function Home() {
   return (
@@ -26,7 +27,7 @@ export default function Home() {
       <ParticularlyHeroic>
         <NiceTranslucentBox>
           <JoshProfile />
-          <HitCount />
+          <VisitCount />
         </NiceTranslucentBox>
       </ParticularlyHeroic>
 

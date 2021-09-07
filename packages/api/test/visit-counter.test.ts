@@ -1,4 +1,4 @@
-import { HitCounter } from '../src/hit-counter';
+import { VisitCounter } from '../src/visit-counter';
 import { getDynamoDB, initTable } from './dynamodb-init';
 
 const TEST_TABLE_NAME = 'TEST_TABLE';
@@ -21,42 +21,10 @@ test('setupTable', async () => {
   expect(items.Items?.length).toEqual(0);
 }, 30000);
 
-describe('HitCounter.optimisticallyLocking', () => {
-  test('first hit', async () => {
-    // GIVEN
-    const hitCounter = HitCounter.optimisticallyLocking({
-      tableName: TEST_TABLE_NAME,
-      dynamoDB: dynamoDB,
-    });
-
-    // WHEN
-    const hitCount = await hitCounter.hit();
-
-    // THEN
-    expect(hitCount).toEqual(1);
-  });
-
-  test('second hit', async () => {
-    // GIVEN
-    const hitCounter = HitCounter.optimisticallyLocking({
-      tableName: TEST_TABLE_NAME,
-      dynamoDB: dynamoDB,
-    });
-
-    await hitCounter.hit(); // First hit
-
-    // WHEN
-    const hitCount = await hitCounter.hit();
-
-    // THEN
-    expect(hitCount).toEqual(2);
-  });
-});
-
 describe('HitCounter.expressionIncrementing', () => {
   test('first hit', async () => {
     // GIVEN
-    const hitCounter = HitCounter.expressionIncrementing({
+    const hitCounter = VisitCounter.expressionIncrementing({
       tableName: TEST_TABLE_NAME,
       dynamoDB: dynamoDB,
     });
@@ -70,7 +38,7 @@ describe('HitCounter.expressionIncrementing', () => {
 
   test('second hit', async () => {
     // GIVEN
-    const hitCounter = HitCounter.expressionIncrementing({
+    const hitCounter = VisitCounter.expressionIncrementing({
       tableName: TEST_TABLE_NAME,
       dynamoDB: dynamoDB,
     });

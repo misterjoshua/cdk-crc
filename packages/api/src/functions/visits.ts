@@ -1,7 +1,7 @@
 import type * as lambda from 'aws-lambda';
 import * as AWS from 'aws-sdk';
 import { FUNCTION_DATABASE_ENV_NAME } from '../constants';
-import { HitCounter } from '../hit-counter';
+import { VisitCounter } from '../visit-counter';
 
 const tableName = getDatabaseTableName();
 const dynamoDB = new AWS.DynamoDB();
@@ -10,12 +10,12 @@ export async function handler(
   event: lambda.APIGatewayProxyEventV2,
   _context: unknown,
 ): Promise<lambda.APIGatewayProxyResultV2> {
-  const hitCounter = HitCounter.expressionIncrementing({
+  const visitCounter = VisitCounter.expressionIncrementing({
     dynamoDB,
     tableName,
   });
 
-  const hitCount = await hitCounter.hit();
+  const visitCount = await visitCounter.hit();
 
   return {
     statusCode: 200,
@@ -23,7 +23,7 @@ export async function handler(
       'content-type': 'application/json',
     },
     body: JSON.stringify({
-      hitCount,
+      visitCount,
     }),
   };
 }
