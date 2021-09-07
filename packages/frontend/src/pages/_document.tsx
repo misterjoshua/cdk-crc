@@ -6,6 +6,7 @@ import Document, {
   NextScript,
 } from 'next/document';
 import React from 'react';
+import { GoogleGtag } from '../components/google-gtag';
 
 class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
@@ -17,7 +18,9 @@ class MyDocument extends Document {
     // noinspection HtmlRequiredTitleElement
     return (
       <Html lang="en">
-        <Head />
+        <Head>
+          <GoogleGtag />
+        </Head>
         <body>
           <Main />
           <NextScript />
