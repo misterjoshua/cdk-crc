@@ -20,6 +20,7 @@ class MyDocument extends Document {
       <Html lang="en">
         <Head>
           <GoogleGtag />
+          <link rel="manifest" href="/manifest.json" />
         </Head>
         <body>
           <Main />
