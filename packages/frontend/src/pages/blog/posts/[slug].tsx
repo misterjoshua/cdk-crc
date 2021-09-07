@@ -38,6 +38,11 @@ export default function BlogPostPage(props: BlogPostPageProps) {
       <Head>
         <title>{parse(post.title)} - Josh's Blog</title>
         <meta name="description" content={stripTags(post.excerpt)} />
+        <meta property="og:title" content={stripTags(post.title)} />
+        <meta property="og:description" content={stripTags(post.excerpt)} />
+        {post.featuredImageUrl && (
+          <meta property="og:image" content={post.featuredImageUrl} />
+        )}
       </Head>
 
       <ParticularlyHeroic baseHue={BASE_HUE_BLOG}>

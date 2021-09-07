@@ -74,6 +74,7 @@ export interface BlogPost {
   readonly date: string;
   readonly excerpt: string;
   readonly content: string;
+  readonly featuredImageUrl?: string;
 }
 
 export function mapPostToBlogIndexItem(post: any): BlogPost {
@@ -84,6 +85,7 @@ export function mapPostToBlogIndexItem(post: any): BlogPost {
     date: post.date_gmt,
     excerpt: post.excerpt.rendered,
     content: post.content.rendered,
+    featuredImageUrl: post.jetpack_featured_media_url,
   };
 }
 
