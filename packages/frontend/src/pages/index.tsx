@@ -36,12 +36,11 @@ export default function Home() {
           <EasyReading>
             <h3 className="text-center">About Josh</h3>
             <p>
-              Josh is a driven entrepreneur and professional developer,
-              relentless about producing great value for customers. Using his
-              advanced knowledge and experience with cloud-native architectures,
-              Josh builds reliable, scalable, and cost-conscious business
-              solutions. Josh will make an excellent addition to your projects
-              and your team.
+              Josh is a driven entrepreneur, cloud-native developer, and
+              team-player. Using greater than ten years of experience in the
+              cloud, Josh builds reliable, scalable, and cost-efficient business
+              solutions. No matter the project, Josh will make an excellent
+              addition to your team.
             </p>
           </EasyReading>
         </TextBlock>
